@@ -1,3 +1,5 @@
 .vscode/
-CA35/
+instances/CA35/image
+instances/CA35/workspace
+runs/
 scripts/push-github.sh

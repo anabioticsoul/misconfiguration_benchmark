@@ -1,0 +1,55 @@
+{
+  "instance_id": "CA35",
+  "benchmark": "MisconfigBench",
+  "version": "0.2",
+  "task_type": "service_troubleshooting",
+  "software": {
+    "name": "MySQL",
+    "version": "8.0.27"
+  },
+  "source": {
+    "type": "StackOverflow",
+    "url": "https://stackoverflow.com/questions/19300501/mysql-my-cnf-not-reading-credentials-properly"
+  },
+  "image": {
+    "name": "ca35:latest",
+    "archive": "image/CA35.tar.gz",
+    "archive_format": "rootfs_tar_gzip",
+    "import_changes": [
+      "ENTRYPOINT [\"/usr/local/bin/docker-entrypoint.sh\"]",
+      "CMD [\"mysqld\"]"
+    ]
+  },
+  "runtime": {
+    "ready_check": "test -S /var/run/mysqld/mysqld.sock",
+    "ready_timeout_seconds": 30
+  },
+  "task_files": {
+    "public_problem_statement": "testcase/description.md",
+    "private_metadata": "testcase/metadata.json",
+    "reference_patch": "testcase/gold_patch.diff"
+  },
+  "evaluator_harness": {
+    "visibility": "private",
+    "reproduce": "harness/repro.sh",
+    "evaluate": "harness/eval.sh",
+    "delivery": "copied_into_ephemeral_container"
+  },
+  "host_harness": {
+    "validate_case": "harness/validate.sh",
+    "evaluate_prediction": "eval/eval_patch.sh"
+  },
+  "patch_protocol": {
+    "format": "unified_diff",
+    "apply_workdir": "isolated_host_staging_root",
+    "apply_command": "git apply --unsafe-paths",
+    "container_delivery": "copy_allowed_configuration_files_only"
+  },
+  "success_criteria": {
+    "patch_applies": true,
+    "evaluation_script_exit_code": 0,
+    "only_allowed_files_modified": true,
+    "required_configuration_option_modified": true,
+    "authentication_remains_enabled": true
+  }
+}

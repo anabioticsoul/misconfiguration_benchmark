@@ -1,0 +1,82 @@
+{
+  "instance_id": "CA35",
+  "source": {
+    "type": "StackOverflow",
+    "url": "https://stackoverflow.com/questions/19300501/mysql-my-cnf-not-reading-credentials-properly",
+    "summary": "MySQL client can log in with explicit credentials, but fails when the default client invocation reads its configured credentials."
+  },
+  "visibility": "private",
+  "private_oracle": {
+    "root_cause_subtype": "syntax error",
+    "faulty_targets": [
+      {
+        "path": "/etc/mysql/my.cnf",
+        "section": "client",
+        "option": "password"
+      }
+    ],
+    "exact_value_required": false
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": [
+      "/etc/mysql/my.cnf"
+    ],
+    "required_modified_options": [
+      {
+        "path": "/etc/mysql/my.cnf",
+        "section": "client",
+        "option": "password"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "changing benchmark harness scripts",
+      "changing database users or passwords",
+      "disabling authentication",
+      "wrapping or replacing the mysql client command"
+    ]
+  },
+  "scoring_dimensions": [
+    {
+      "name": "configuration_intervention",
+      "required": true,
+      "description": "The submitted patch changes the intended configuration repair surface."
+    },
+    {
+      "name": "symptom_resolution",
+      "required": true,
+      "description": "The standard MySQL client invocation succeeds and returns the expected query result."
+    },
+    {
+      "name": "shortcut_resistance",
+      "required": true,
+      "description": "An invalid password remains rejected after the repair."
+    },
+    {
+      "name": "patch_hygiene",
+      "required": true,
+      "description": "No files outside the allowed configuration surface are modified."
+    }
+  ],
+  "observable_symptom": {
+    "command": "mysql -N -B -e 'SELECT 1;'",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": [
+        "ERROR 1045",
+        "Access denied"
+      ]
+    }
+  },
+  "oracle": {
+    "post_fix_positive_check": {
+      "command": "mysql -N -B -e 'SELECT 1;'",
+      "expected_stdout": "1",
+      "expected_exit_code": 0
+    },
+    "post_fix_negative_check": {
+      "command": "mysql --no-defaults -uroot -pwrongpass -N -B -e 'SELECT 1;'",
+      "expected_exit_code": "nonzero"
+    }
+  }
+}
