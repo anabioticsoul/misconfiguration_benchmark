@@ -1,0 +1,8 @@
+diff --git a/etc/mysql/conf.d/fault.cnf b/etc/mysql/conf.d/fault.cnf
+index 4d2f1a1..b9a8f2c 100644
+--- a/etc/mysql/conf.d/fault.cnf
++++ b/etc/mysql/conf.d/fault.cnf
+@@ -1,2 +1,2 @@
+ [mysqld]
+-query_cache_size-128M
++query_cache_size=128M

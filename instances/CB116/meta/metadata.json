@@ -1,0 +1,8 @@
+{
+  "instance_id": "CB116",
+  "visibility": "private",
+  "private_oracle": {"classification": {"taxonomy_version": "1.0", "category_id": "CB-1", "root_cause_detail": "mysql_bind_address_not_present_on_host"}, "faulty_targets": [{"path": "/etc/mysql/conf.d/cb116.cnf", "section": "mysqld", "option": "bind-address"}]},
+  "repair_policy": {"required_intervention": "config_change", "allowed_modified_files": ["/etc/mysql/conf.d/cb116.cnf"], "required_modified_options": [{"path": "/etc/mysql/conf.d/cb116.cnf", "section": "mysqld", "option": "bind-address"}], "forbidden_shortcuts": ["Do not remove the bind-address option or disable networking; set it to localhost."]},
+  "observable_symptom": {"command": "mysqld --user=mysql --console", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["Cannot assign requested address"]}},
+  "oracle": {"fail_to_pass": [{"path": "harness/f2p.sh", "description": "mysqld starts successfully after binding to localhost"}], "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The configuration remains present, uses the mysqld section, and preserves TCP port 3306."}]}
+}

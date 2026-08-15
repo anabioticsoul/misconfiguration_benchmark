@@ -1,0 +1,1 @@
+Build from ubuntu:22.04. Install the Ubuntu MySQL server package in the base layer. The base must contain a working initialized MySQL installation; the instance layer adds only the malformed option that prevents startup. Keep the final container alive independently of MySQL so an investigator can inspect and edit configuration.

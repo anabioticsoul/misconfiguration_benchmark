@@ -1,0 +1,11 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CA35",
+  "images": {
+    "source": "misconfigbench/mysql-8.0.27:base",
+    "base": "ca35:base",
+    "output": "ca35:latest"
+  },
+  "context_dir": "build/context",
+  "archive": "image/CA35.tar.gz"
+}

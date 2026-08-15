@@ -1,0 +1,55 @@
+{
+  "instance_id": "CA1",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-1",
+      "root_cause_detail": "malformed_mysqld_option_assignment_uses_hyphen"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/mysql/conf.d/fault.cnf",
+        "section": "mysqld",
+        "option": "query_cache_size-128M"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/mysql/conf.d/fault.cnf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/mysql/conf.d/fault.cnf",
+        "section": "mysqld",
+        "option": "query_cache_size-128M"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not remove or disable MySQL",
+      "Do not bypass configuration parsing with --no-defaults",
+      "Do not use skip-grant-tables or replace the server binary"
+    ]
+  },
+  "observable_symptom": {
+    "command": "mysqld --user=mysql --datadir=/var/lib/mysql --socket=/tmp/ca1-mysqld.sock --pid-file=/tmp/ca1-mysqld.pid",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["query_cache_size-128M"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "MySQL accepts the configuration and answers a local ping after repair"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The MySQL installation and intended configuration file remain present"
+      }
+    ]
+  }
+}

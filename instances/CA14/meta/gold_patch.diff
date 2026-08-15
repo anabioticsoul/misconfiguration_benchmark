@@ -1,0 +1,14 @@
+diff --git a/etc/mysql/my.cnf b/etc/mysql/my.cnf
+index 0000000..1111111 100644
+--- a/etc/mysql/my.cnf
++++ b/etc/mysql/my.cnf
+@@ -3,8 +3,8 @@
+ socket          = /var/run/mysqld/mysqld.sock
+ datadir         = /var/lib/mysql
+ secure-file-priv= NULL
++default_time_zone=Brazil/East
+ 
+ [client]
+ password = "ca35\\spass"
+-time_zone=Brazil/East
+ !includedir /etc/mysql/conf.d/

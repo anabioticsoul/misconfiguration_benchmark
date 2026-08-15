@@ -1,0 +1,8 @@
+{
+  "instance_id": "CD158",
+  "visibility": "private",
+  "private_oracle": {"classification": {"taxonomy_version": "1.0", "category_id": "CD-2", "root_cause_detail": "editor_backup_file_loaded_as_nginx_site_configuration"}, "faulty_targets": [{"path": "/etc/nginx/sites-enabled/default~", "section": "http/server", "option": "fastcgi_pass"}]},
+  "repair_policy": {"required_intervention": "config_change", "allowed_modified_files": ["/etc/nginx/sites-enabled/default~"], "required_modified_options": [{"path": "/etc/nginx/sites-enabled/default~", "section": "http/server", "option": "fastcgi_pass"}], "forbidden_shortcuts": ["Do not replace nginx, suppress nginx validation, or remove the primary default site"]},
+  "observable_symptom": {"command": "nginx -t", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["fastcgi_pass", "not allowed here", "default~"]}},
+  "oracle": {"fail_to_pass": [{"path": "harness/f2p.sh", "description": "nginx configuration validates and nginx serves the default site after the backup file is removed"}], "pass_to_pass": [{"path": "harness/p2p.sh", "description": "nginx remains installed and its primary default site remains present"}]}
+}

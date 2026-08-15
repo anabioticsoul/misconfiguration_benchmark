@@ -1,0 +1,9 @@
+diff --git a/etc/mysql/conf.d/cb116.cnf b/etc/mysql/conf.d/cb116.cnf
+index 2b5f6b1..c7ddc5e 100644
+--- a/etc/mysql/conf.d/cb116.cnf
++++ b/etc/mysql/conf.d/cb116.cnf
+@@ -1,3 +1,3 @@
+ [mysqld]
+-bind-address = 192.168.1.3
++bind-address = localhost
+ port = 3306

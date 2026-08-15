@@ -1,0 +1,8 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CD158",
+  "images": {"source": "nginx:1.18.0", "base": "cd158:base", "output": "cd158:latest"},
+  "context_dir": "build/context",
+  "scripts": {"base": "build/context/scripts/base.sh", "instance": "build/context/scripts/instance.sh"},
+  "archive": "image/CD158.tar.gz"
+}

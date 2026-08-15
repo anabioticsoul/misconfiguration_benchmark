@@ -1,0 +1,66 @@
+{
+  "instance_id": "CA14",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-2",
+      "root_cause_detail": "invalid_mysql_option_name"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/mysql/my.cnf",
+        "section": "client",
+        "option": "time_zone"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": [
+      "/etc/mysql/my.cnf"
+    ],
+    "required_modified_options": [
+      {
+        "path": "/etc/mysql/my.cnf",
+        "section": "client",
+        "option": "time_zone"
+      },
+      {
+        "path": "/etc/mysql/my.cnf",
+        "section": "mysqld",
+        "option": "default_time_zone"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "changing benchmark harness scripts",
+      "wrapping or replacing the mysql client",
+      "disabling option-file loading",
+      "stopping the MySQL service"
+    ]
+  },
+  "observable_symptom": {
+    "command": "mysql",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": [
+        "unknown variable",
+        "time_zone=Brazil/East"
+      ]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The default client connects and the server default time zone is Brazil/East."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The server remains healthy and accepts an explicit authenticated query."
+      }
+    ]
+  }
+}

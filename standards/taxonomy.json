@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0",
+  "name": "MisconfigBench taxonomy",
+  "description": "Controlled root-cause taxonomy for MisconfigBench instances. Case metadata should reference subtype ids instead of duplicating category names.",
+  "types": [
+    {
+      "id": "CA",
+      "name": "Constraint violation",
+      "subtypes": [
+        {
+          "id": "CA-1",
+          "name": "Syntax error",
+          "description": "The configuration violates syntax or escaping rules required by the target parser or runtime."
+        },
+        {
+          "id": "CA-2",
+          "name": "Invalid option name",
+          "description": "The configuration uses an unsupported, misspelled, deprecated, or wrong-context option name."
+        },
+        {
+          "id": "CA-3",
+          "name": "Misplaced configuration",
+          "description": "A valid option is placed in the wrong file, section, block, scope, or precedence layer."
+        },
+        {
+          "id": "CA-4",
+          "name": "Duplicate option",
+          "description": "Multiple declarations of the same option conflict or cause an unintended effective value."
+        },
+        {
+          "id": "CA-5",
+          "name": "Intra-component error",
+          "description": "A single component's configuration violates constraints among its own options, sections, or runtime assumptions."
+        },
+        {
+          "id": "CA-6",
+          "name": "Cross-component error",
+          "description": "Configuration values across components are inconsistent, such as a client and server disagreeing on protocol, address, credential, or mode."
+        }
+      ]
+    },
+    {
+      "id": "CB",
+      "name": "Resource unavailability",
+      "subtypes": [
+        {
+          "id": "CB-1",
+          "name": "Resource identifier mismatch",
+          "description": "A configured resource name, path, socket, host, port, database, user, queue, topic, or service identifier does not match the actual resource."
+        },
+        {
+          "id": "CB-2",
+          "name": "Resource competition",
+          "description": "A required resource is unavailable because of contention, conflict, exhaustion, or exclusive ownership by another process or component."
+        },
+        {
+          "id": "CB-3",
+          "name": "Unauthorized resource access",
+          "description": "The component cannot access a required resource because of permissions, credentials, policy, ownership, ACLs, or authentication constraints."
+        },
+        {
+          "id": "CB-4",
+          "name": "Hardware limitation",
+          "description": "The configured behavior exceeds available hardware, kernel, platform, filesystem, memory, CPU, disk, or device capabilities."
+        }
+      ]
+    },
+    {
+      "id": "CC",
+      "name": "Component integration error",
+      "subtypes": [
+        {
+          "id": "CC-1",
+          "name": "Component incompatibility",
+          "description": "Two or more components are configured in mutually incompatible versions, protocols, feature sets, modes, or assumptions."
+        },
+        {
+          "id": "CC-2",
+          "name": "Component missing",
+          "description": "A required dependency, service, plugin, extension, module, binary, certificate, or sidecar is absent from the runtime environment."
+        }
+      ]
+    },
+    {
+      "id": "CD",
+      "name": "Configuration semantic misinterpretation",
+      "subtypes": [
+        {
+          "id": "CD-1",
+          "name": "Ambiguous option name",
+          "description": "The option name is valid but misleading, overloaded, or interpreted differently than the operator expected."
+        },
+        {
+          "id": "CD-2",
+          "name": "Option value and functional requirement mismatch",
+          "description": "The configured value is valid, but its semantics do not satisfy the intended behavior or operational requirement."
+        }
+      ]
+    }
+  ]
+}

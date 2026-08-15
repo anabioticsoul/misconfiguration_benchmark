@@ -1,0 +1,282 @@
+# MisconfigBench Instance Builder
+
+You are the builder agent. Convert one public misconfiguration description into
+a reproducible, automatically scored Docker benchmark instance. You create the
+faulty environment; you do not repair it.
+
+## Sole Source
+
+Instance ID: `{{ instance_id }}`
+
+The description below is the only case-specific source of truth:
+
+{{ public_problem }}
+
+Do not reuse assumptions or private oracle details from another instance.
+
+## Taxonomy
+
+The first two characters of the instance ID encode its top-level taxonomy type:
+`CA`, `CB`, `CC`, or `CD`. Choose exactly one subtype under that encoded type
+and store only its ID in metadata. For example, a `CD...` instance must use
+`CD-1` or `CD-2`; it must never use a `CA-*`, `CB-*`, or `CC-*` ID.
+
+```json
+{{ taxonomy }}
+```
+
+## Available Source Images
+
+Use an independent clean image that already contains the target software when
+possible. Prefer a versioned official upstream image or a purpose-built
+`misconfigbench/...:base` image. Never use another benchmark case image such as
+`ca35:base`, `cb116:latest`, or any tag matching `CA|CB|CC|CD` plus digits; case
+images contain unrelated faults and stale dependencies. A purpose-built image
+is valid only when its repository name identifies the target software; for
+example, `misconfigbench/mysql-...` must never be used for an Nginx instance.
+Do not install the target software onto an unrelated image merely because it is
+local. The host automatically pulls missing upstream images and builds for the
+selected source image's OS/architecture, including `linux/amd64` images on
+Apple Silicon.
+
+{{ image_inventory }}
+
+## Required Output
+
+Use `BuildWorkspaceTool` to create every file below. Paths are relative to the
+instance workspace.
+
+- `instance.json`
+- `meta/metadata.json`
+- `meta/gold_patch.diff`
+- `build/build.json`
+- `build/requirements.md`
+- `build/context/base-overlay/...`
+- `build/context/fault-overlay/...`
+- `harness/repro.sh`
+- `harness/f2p.sh`
+- `harness/p2p.sh`
+- `harness/eval_patch.sh`
+
+Do not create Dockerfiles. The host uses the shared templates in
+`templates/builder/`.
+
+`build/build.json` must use this shape:
+
+```json
+{
+  "schema_version": "2.0",
+  "instance_id": "{{ instance_id }}",
+  "images": {
+    "source": "<clean source image>",
+    "base": "{{ instance_id | lower }}:base",
+    "output": "{{ instance_id | lower }}:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh",
+    "instance": "build/context/scripts/instance.sh"
+  },
+  "archive": "image/{{ instance_id }}.tar.gz"
+}
+```
+
+Omit either script entry when that layer needs no command. The generic base
+template copies `base-overlay/` onto the clean source. The generic instance
+template copies `fault-overlay/` onto that base. Optional scripts run after the
+corresponding copy and must be deterministic and non-interactive.
+
+`instance.json` must use the exact field names and nesting below. Replace
+angle-bracket placeholder values, but do not rename, flatten, or omit fields:
+
+```json
+{
+  "instance_id": "{{ instance_id }}",
+  "benchmark": "MisconfigBench",
+  "version": "0.2",
+  "task_type": "misconfig_troubleshooting",
+  "software": {
+    "name": "<software name>",
+    "version": "<software version>"
+  },
+  "source": {
+    "type": "<source type>",
+    "url": "<source URL or empty string>"
+  },
+  "image": {
+    "name": "{{ instance_id | lower }}:latest",
+    "archive": "image/{{ instance_id }}.tar.gz",
+    "archive_format": "docker_save_tar_gzip",
+    "load_command": "docker load -i"
+  },
+  "runtime": {
+    "ready_check": "<shell readiness check>",
+    "ready_timeout_seconds": 60,
+    "entrypoint": "<optional absolute executable>",
+    "command": ["<optional argument>", "<optional argument>"]
+  },
+  "task_files": {
+    "public_problem_statement": "meta/description.md",
+    "private_metadata": "meta/metadata.json",
+    "reference_patch": "meta/gold_patch.diff",
+    "fail_to_pass": ["harness/f2p.sh"],
+    "pass_to_pass": ["harness/p2p.sh"]
+  },
+  "prompt_protocol": {
+    "template": "prompts/misconfig_troubleshooting.j2",
+    "case_prompt": "meta/description.md"
+  },
+  "builder_protocol": {
+    "template": "prompts/instance_builder.j2",
+    "spec": "build/build.json",
+    "requirements": "build/requirements.md"
+  },
+  "evaluator_harness": {
+    "visibility": "private",
+    "reproduce": "harness/repro.sh",
+    "fail_to_pass": ["harness/f2p.sh"],
+    "pass_to_pass": ["harness/p2p.sh"],
+    "delivery": "host_controlled_ephemeral_container"
+  },
+  "host_harness": {
+    "evaluate_prediction": "harness/eval_patch.sh"
+  },
+  "patch_protocol": {
+    "format": "unified_diff",
+    "baseline_source": "fresh_faulty_container",
+    "apply_workdir": "dynamic_host_staging_root",
+    "apply_command": "git apply --unsafe-paths",
+    "container_delivery": "copy_allowed_configuration_files_only"
+  },
+  "success_criteria": {
+    "patch_applies": true,
+    "evaluation_script_exit_code": 0,
+    "only_allowed_files_modified": true,
+    "required_configuration_option_modified": true
+  }
+}
+```
+
+Do not add `image.distribution` while generating the instance. The host adds
+the immutable registry reference and digest only after the image passes
+validation and is successfully pushed.
+
+Omit `runtime.entrypoint` and `runtime.command` when the source image's normal
+startup must run. When the intended fault prevents the target service from
+starting, keep the benchmark container alive for investigation, for example:
+
+```json
+{
+  "ready_check": "test -f /etc/mysql/conf.d/fault.cnf",
+  "ready_timeout_seconds": 60,
+  "entrypoint": "/bin/bash",
+  "command": ["-lc", "exec tail -f /dev/null"]
+}
+```
+
+The reproduction and F2P scripts must then start the real target service
+themselves to observe the failure and repaired behavior.
+
+`meta/metadata.json` is private and must use this exact nesting:
+
+```json
+{
+  "instance_id": "{{ instance_id }}",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "<taxonomy subtype ID>",
+      "root_cause_detail": "<machine-readable detail>"
+    },
+    "faulty_targets": [
+      {
+        "path": "<absolute container path>",
+        "section": "<configuration section>",
+        "option": "<configuration option>"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["<absolute container path>"],
+    "required_modified_options": [
+      {
+        "path": "<absolute container path>",
+        "section": "<configuration section>",
+        "option": "<configuration option>"
+      }
+    ],
+    "forbidden_shortcuts": ["<shortcut description>"]
+  },
+  "observable_symptom": {
+    "command": "<reproduction command>",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["<stable symptom text>"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "<behavior restored by repair>"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "<behavior that must remain valid>"
+      }
+    ]
+  }
+}
+```
+
+## Behavioral Contract
+
+- The base image is clean and exhibits the intended correct behavior.
+- The output image introduces exactly the fault supported by the description.
+- `repro.sh` exits 0 only when the expected pre-fix symptom is observed.
+- `repro.sh` must execute the real failing software command and assert its exit
+  code and output. Do not merely inspect configuration text and print a
+  synthetic copy of the expected error.
+- `f2p.sh` fails before the repair and passes after it.
+- `p2p.sh` passes both before and after repair and blocks obvious shortcuts.
+- The host runs F2P and P2P against the faulty image before applying the gold
+  patch. Every F2P script must fail there and every P2P script must pass.
+- P2P may assert only behavior or configuration that genuinely exists before
+  the repair and must remain afterward. Do not require an undeclared option,
+  the repaired value, or an incidental implementation detail.
+- `gold_patch.diff` changes only allowed configuration files.
+- `eval_patch.sh` dynamically extracts those files from a fresh faulty
+  container, checks patch scope, applies the patch, starts another fresh
+  container, waits for readiness, and runs F2P plus P2P.
+- `eval_patch.sh` must accept exactly the host runner interface
+  `eval_patch.sh <prediction-patch> [image-name]`. Read `$1` as the patch path
+  and `${2:-{{ instance_id | lower }}:latest}` as the image. Do not rely on the
+  current working directory or a hard-coded `meta/gold_patch.diff`.
+- The patch argument may be absolute. Normalize it before changing directories:
+  `patch_file="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"`. Never prefix
+  an absolute patch path with `$PWD`.
+- Host evaluator scripts must run on macOS and Linux. Do not use GNU-only
+  extensions such as `find -printf`, `readlink -f`, or `sed -r`. Prefer Git
+  commands, POSIX utilities, and shell parameter expansion.
+- Harnesses, gold patches, and private metadata must never be copied into the
+  image.
+
+Use `#!/usr/bin/env bash` for every script that uses `set -euo pipefail`; do not
+combine `#!/bin/sh` with `pipefail`. Avoid sleeps as the primary readiness
+mechanism. Pin software versions where practical. Keep credentials synthetic
+and isolated. Check that every non-POSIX diagnostic command used by a harness
+exists in the selected image; a missing command must fail the harness rather
+than accidentally satisfy a negated condition.
+
+The final container must remain running and provide an investigation shell even
+when the target service itself fails to start. `runtime.ready_check` describes
+when the container is ready for the fixer agent; it must not wait for a service
+whose absence is the intended symptom.
+
+Before finishing, read both generated JSON files back and compare every field
+name and nesting level with the exact contracts above. Finish only after all
+required files are present and internally consistent.

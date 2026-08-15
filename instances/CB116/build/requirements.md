@@ -1,0 +1,1 @@
+Use the pinned mysql:5.6 source image. The fault layer must add only a mysqld configuration fragment setting bind-address to the unavailable DHCP address 192.168.1.3. Keep the container alive independently of mysqld so an investigator can inspect and edit the configuration. Harnesses must invoke the real mysqld binary and must not use synthetic errors.

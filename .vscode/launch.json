@@ -1,0 +1,61 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Builder Agent",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.builder.run_case",
+            "args": [
+                "${input:instanceId}",
+                "--agent",
+                "openhands",
+                "--regenerate",
+                "--subscription-login",
+                "--model",
+                "gpt-5.6-luna"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Verifier Agent",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.verifier.run_case",
+            "args": [
+                "${input:instanceId}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Fixer Agent",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.fixer.run_case",
+            "args": [
+                "${input:instanceId}",
+                "--subscription-login",
+                "--model",
+                "gpt-5.6-luna"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ],
+    "inputs": [
+        {
+            "id": "instanceId",
+            "type": "promptString",
+            "description": "MisconfigBench instance ID",
+            "default": "CA14"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+  "instance_id": "CD152",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "fs.defaultFS points to a reachable-looking but nonexistent NameNode endpoint instead of the local embedded HDFS service"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/hadoop/etc/hadoop/core-site.xml",
+        "section": "configuration",
+        "option": "fs.defaultFS"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/hadoop/etc/hadoop/core-site.xml"],
+    "required_modified_options": [
+      {
+        "path": "/opt/hadoop/etc/hadoop/core-site.xml",
+        "section": "configuration",
+        "option": "fs.defaultFS"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not remove the HDFS scheme, bypass the Hadoop client, or alter the harness command"]
+  },
+  "observable_symptom": {
+    "command": "/opt/hadoop/bin/hdfs dfs -ls /",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Connection refused"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "HDFS client listing fails before repair and succeeds after fs.defaultFS points to the local NameNode"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "Hadoop installation and XML configuration remain valid, and the client still uses HDFS"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+The image must contain nginx and a minimal valid default site. The instance layer adds an editor backup named `default~` under `/etc/nginx/sites-enabled/`; nginx loads it and fails because `fastcgi_pass` is in server scope. Keep the container alive for investigation. Do not copy benchmark metadata or harness files into the image.

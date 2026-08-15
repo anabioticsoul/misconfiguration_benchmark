@@ -1,0 +1,8 @@
+FROM {{ source_image }}
+
+COPY base-overlay/ /
+{% if build_script %}
+COPY {{ build_script }} /tmp/misconfigbench-build-layer.sh
+RUN bash /tmp/misconfigbench-build-layer.sh \
+    && rm -f /tmp/misconfigbench-build-layer.sh
+{% endif %}

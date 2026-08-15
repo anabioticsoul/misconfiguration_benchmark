@@ -2,10 +2,10 @@
 set -euo pipefail
 
 echo "[CA35] Reproducing MySQL client authentication failure..."
-echo "[INFO] Running the default MySQL client health check..."
+echo "[INFO] Running the default MySQL client invocation..."
 
 set +e
-OUTPUT="$(mysql -N -B -e 'SELECT 1;' 2>&1)"
+OUTPUT="$(mysql 2>&1)"
 STATUS=$?
 set -e
 

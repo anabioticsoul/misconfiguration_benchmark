@@ -1,3 +1,0 @@
-1. The repository includes an automated test script at `tests/test_agent.py` that runs an OpenHands conversation with terminal, file editor, and task tracker tools.
-2. The project contains an agent configuration file at `agents/builder.py` that initializes an OpenHands LLM using the `gpt-5.2-codex` model.
-3. There is a helper script at `scripts/push-github.sh` that commits local changes (when present) and pushes the current branch to `origin`.
