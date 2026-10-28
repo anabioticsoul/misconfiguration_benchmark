@@ -17,10 +17,17 @@ from agents.manager.distribution import (
     record_image_distribution,
 )
 from agents.manager.evaluation import evaluate_prediction
+from agents.manager.failure_log import (
+    capture_agent_exception,
+    configure_agent_failure_context,
+    run_agent_entrypoint,
+)
 from agents.manager.openhands import (
+    DEFAULT_LLM_PROVIDER,
     DEFAULT_SUBSCRIPTION_MODEL,
     OpenHandsConfig,
     run_openhands_agent,
+    summarize_agent_usage,
 )
 from agents.manager.observability import observe_stage
 from agents.manager.settings import load_repository_env
@@ -37,6 +44,7 @@ __all__ = [
     "ContainerRuntime",
     "ContractValidationError",
     "DEFAULT_SUBSCRIPTION_MODEL",
+    "DEFAULT_LLM_PROVIDER",
     "DockerInstanceBuilder",
     "InstanceBuildDefinition",
     "OpenHandsConfig",
@@ -44,6 +52,8 @@ __all__ = [
     "RegistryConfig",
     "TAXONOMY_PATH",
     "build_prediction_patch",
+    "capture_agent_exception",
+    "configure_agent_failure_context",
     "create_run_dir",
     "evaluate_prediction",
     "load_case_documents",
@@ -53,6 +63,8 @@ __all__ = [
     "push_registry_image",
     "record_image_distribution",
     "render_template",
+    "run_agent_entrypoint",
     "run_openhands_agent",
+    "summarize_agent_usage",
     "WorkspaceFiles",
 ]

@@ -6,14 +6,17 @@ restores the required behavior through the intended configuration surface.
 
 ## Agent Pipeline
 
-MisconfigBench separates environment construction, validation, and repair into
-three agent roles:
+MisconfigBench separates environment construction, validation, diagnosis, and
+repair into four roles:
 
 1. The builder agent creates an instance from its description, including the
    faulty Docker environment and case metadata.
 2. The verifier agent checks that the instance reproduces the description and
    that its fail-to-pass, pass-to-pass, and evaluation paths behave correctly.
-3. The fixer agent diagnoses and repairs the validated faulty environment.
+3. The diagnosis evaluator agent investigates a fresh faulty environment and
+   returns a ranked, structured root-cause prediction. A private deterministic
+   scorer evaluates that prediction without exposing oracle artifacts.
+4. The fixer agent diagnoses and repairs the validated faulty environment.
 
 Shared case loading, Docker lifecycle, run artifacts, evaluator invocation, and
 OpenHands conversation management live in `agents/manager/`. Role packages may
@@ -44,7 +47,7 @@ non-interactive equivalent so automated replay has deterministic exit behavior.
 ## Prompt Protocol
 
 Each case stores its public task text in its own case directory, for example
-`instances/CA35/meta/description.md`. The fixer agent runner renders the
+`instances/CA/CA35/meta/description.md`. The fixer agent runner renders the
 final agent task from a benchmark-level prompt template such as
 `prompts/misconfig_troubleshooting.j2`.
 
@@ -74,6 +77,11 @@ Evaluator-only metadata records:
 - forbidden shortcuts;
 - fail-to-pass and pass-to-pass behavioral checks;
 - a canonical patch for validation.
+
+For diagnosis evaluation, `private_oracle.diagnosis_oracle.component` records
+the canonical affected component. `faulty_targets` provides the canonical
+configuration-level target `(path, section, option)`. The diagnostic agent sees
+neither field.
 
 Root-cause families and subtypes should follow `standards/taxonomy.json`.
 Case metadata should reference the stable subtype id, such as `CA-1`, instead
@@ -169,3 +177,17 @@ binary:
 
 Trajectory analysis can separately measure whether the agent identified the
 root cause efficiently. The task prompt should not reveal that root cause.
+
+## Diagnosis Evaluation
+
+Diagnosis is scored independently from repair and uses a structured ranked
+prediction containing a taxonomy type/subtype and up to five candidate
+locations. The primary metrics follow process-level diagnosis and fault
+localization practice: Type and Subtype Macro-F1, subtype exact accuracy,
+component and configuration-target Hit@1/3/5, MRR, MAP@5, and strict Joint@K
+(correct subtype and a correct target in the top K). Invalid JSON predictions
+remain in the denominator as all-zero predictions.
+
+The evaluator does not use an LLM judge. Free-text rationales may be retained
+for qualitative or human study, but the headline metrics are deterministic
+comparisons against private taxonomy and target annotations.

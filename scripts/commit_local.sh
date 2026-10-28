@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 GITHUB_FILE_LIMIT=$((100 * 1024 * 1024))
 
 git_repo() {
@@ -12,7 +12,7 @@ git_repo() {
 require_git_repository() {
   local root
   root="$(git_repo rev-parse --show-toplevel)"
-  if [ "$(cd "$root" && pwd)" != "$REPO_ROOT" ]; then
+  if [ "$(cd "$root" && pwd -P)" != "$REPO_ROOT" ]; then
     echo "Error: expected Git repository at $REPO_ROOT" >&2
     return 1
   fi
@@ -47,12 +47,19 @@ file_size() {
   fi
 }
 
+is_public_test_key() {
+  # Public localhost fixture only; a replaced key must fail the audit.
+  [ "$1" = "instances/CA/CA41/build/context/base-overlay/etc/nginx/ssl/server.key" ] || return 1
+  [ "$(shasum -a 256 "$2" | awk '{print $1}')" = "f8fc33770a04a618c2f58c7be2a040eb7cbe75011b7c7aa25ccedf0254671452" ]
+}
+
 validate_publishable_files() {
   local relative path name size
   while IFS= read -r relative; do
     [ -n "$relative" ] || continue
     path="$REPO_ROOT/$relative"
     [ -f "$path" ] || continue
+    if is_public_test_key "$relative" "$path"; then continue; fi
     name="$(basename "$path")"
     case "$name" in
       .env|id_dsa|id_ecdsa|id_ed25519|id_rsa|*.pem|*.key)
@@ -70,7 +77,7 @@ validate_publishable_files() {
         echo "Error: possible credential in $relative" >&2
         return 1
       fi
-      if grep -Eq -- '-----BEGIN [A-Z ]*PRIVATE KEY-----' "$path"; then
+      if grep -Eq -- '^[[:space:]]*-----BEGIN [A-Z ]*PRIVATE KEY-----' "$path"; then
         echo "Error: possible private key in $relative" >&2
         return 1
       fi
@@ -78,9 +85,38 @@ validate_publishable_files() {
   done
 }
 
+validate_index() {
+  local relative size temporary
+  temporary="$(mktemp)"
+  while IFS= read -r -d '' relative; do
+    case "$relative" in
+      runs/*|logs/*|dist/*|assets/*|*/image/*|*/workspace/*|*/.eval-*|*.tar|*.tar.gz|*.tgz)
+        echo "Error: generated/dataset artifact is tracked: $relative" >&2
+        rm -f "$temporary"; return 1 ;;
+    esac
+    if git_repo check-ignore --no-index -q -- "$relative"; then
+      echo "Error: ignored file is still tracked: $relative" >&2
+      rm -f "$temporary"; return 1
+    fi
+    size="$(git_repo cat-file -s ":$relative")"
+    if [ "$size" -ge "$GITHUB_FILE_LIMIT" ]; then
+      echo "Error: staged file at or above 100 MiB: $relative" >&2
+      rm -f "$temporary"; return 1
+    fi
+    git_repo show ":$relative" > "$temporary"
+    if is_public_test_key "$relative" "$temporary"; then continue; fi
+    if LC_ALL=C grep -Eq -- '^[[:space:]]*-----BEGIN [A-Z ]*PRIVATE KEY-----|(^|[^A-Za-z0-9])(hf_[A-Za-z0-9]{25,}|gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|dckr_pat_[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9_-]{30,})' "$temporary"; then
+      echo "Error: possible credential/private key in staged file: $relative" >&2
+      rm -f "$temporary"; return 1
+    fi
+  done < <(git_repo ls-files -z)
+  rm -f "$temporary"
+}
+
 message="feat: update benchmark"
 skip_tests=false
 dry_run=false
+check_index=false
 
 usage() {
   cat <<'EOF'
@@ -92,6 +128,7 @@ Options:
   --message <message>  Commit message (default: feat: update benchmark)
   --skip-tests         Do not run the test suite
   --dry-run            Preview without staging or committing
+  --check-index        Audit staged/tracked files only; do not commit
   -h, --help           Show this help
 EOF
 }
@@ -105,12 +142,17 @@ while [ "$#" -gt 0 ]; do
       ;;
     --skip-tests) skip_tests=true; shift ;;
     --dry-run) dry_run=true; shift ;;
+    --check-index) check_index=true; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Error: unknown argument: $1" >&2; usage >&2; exit 2 ;;
   esac
 done
 
 require_git_repository
+if [ "$check_index" = "true" ]; then
+  validate_index
+  exit 0
+fi
 branch="$(current_branch)"
 paths="$(changed_paths)"
 if [ -z "$paths" ]; then
@@ -138,6 +180,7 @@ if [ "$skip_tests" = "false" ]; then
 fi
 git_repo add --all
 validate_publishable_files <<<"$(staged_paths)"
+validate_index
 git_repo commit -m "$message"
 commit="$(git_repo rev-parse --short HEAD)"
 echo "Created local commit $commit on $branch."

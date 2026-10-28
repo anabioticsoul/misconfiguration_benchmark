@@ -1,0 +1,12 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CB263",
+  "images": {
+    "source": "apache/hadoop:3.3.6",
+    "base": "cb263:base",
+    "output": "cb263:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {},
+  "archive": "image/CB263.tar.gz"
+}

@@ -1,0 +1,20 @@
+{
+  "instance_id": "CC69",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {"taxonomy_version": "1.0", "category_id": "CC-2", "root_cause_detail": "spring_orm_runtime_missing_javax_transaction_api"},
+    "diagnosis_oracle": {"component": "Spring ORM runtime class loading"},
+    "faulty_targets": [{"path": "/opt/cc69/pom.xml", "section": "dependencies", "option": "javax.transaction:javax.transaction-api"}]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/cc69/pom.xml"],
+    "required_modified_options": [{"path": "/opt/cc69/pom.xml", "section": "dependencies", "option": "javax.transaction:javax.transaction-api"}],
+    "forbidden_shortcuts": ["Do not replace the reproduction with a synthetic success message", "Do not modify application source or remove Spring ORM"]
+  },
+  "observable_symptom": {"command": "cd /opt/cc69 && mvn -q exec:java", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["javax/transaction/SystemException"]}},
+  "oracle": {
+    "fail_to_pass": [{"path": "harness/f2p.sh", "description": "SpringSessionContext loads successfully after the missing Javax Transaction API dependency is restored"}],
+    "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The Maven project and original Spring/Hibernate dependency declarations remain present"}]
+  }
+}

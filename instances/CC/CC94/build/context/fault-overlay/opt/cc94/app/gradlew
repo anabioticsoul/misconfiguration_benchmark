@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")"
+version="$(sed -n 's/^java.runtime.version=//p' system.properties)"
+case "$version" in
+  8) export JAVA_HOME=/opt/jdks/java-8 ;;
+  17) export JAVA_HOME="$(dirname "$(dirname "$(readlink -f "$(command -v java)")")")" ;;
+  *) echo "Unsupported java.runtime.version: $version" >&2; exit 2 ;;
+esac
+exec /opt/gradle/gradle-7.6.1/bin/gradle "$@"

@@ -1,0 +1,54 @@
+{
+  "instance_id": "CB203",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CB-1",
+      "root_cause_detail": "http_listener_configured_with_ssl_semantics"
+    },
+    "diagnosis_oracle": {
+      "component": "Nginx HTTP listener"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/nginx/conf.d/default.conf",
+        "section": "server listening on port 80",
+        "option": "listen ... ssl"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/nginx/conf.d/default.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/nginx/conf.d/default.conf",
+        "section": "server listening on port 80",
+        "option": "listen ... ssl"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not bypass Nginx, change the client protocol, or remove the HTTP listener"]
+  },
+  "observable_symptom": {
+    "command": "curl -f -sS -D - -o /dev/null http://127.0.0.1/", 
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["400"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Plain HTTP receives the configured redirect instead of Nginx's HTTPS-port 400 response"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The HTTPS endpoint continues returning a successful response"
+      }
+    ]
+  }
+}

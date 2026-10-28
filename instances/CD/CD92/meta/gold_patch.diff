@@ -1,0 +1,15 @@
+diff --git a/opt/cd92/logback.xml b/opt/cd92/logback.xml
+--- a/opt/cd92/logback.xml
++++ b/opt/cd92/logback.xml
+@@ -5,7 +5,10 @@
+     <appender name="LAST" class="ch.qos.logback.core.rolling.RollingFileAppender">
+         <file>${LOG_DIR}/last.log</file>
+         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+-            <fileNamePattern>${LOG_DIR}/last.%d{yyyy-MM}.gz</fileNamePattern>
++            <fileNamePattern>${LOG_DIR}/last.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+             <maxHistory>24</maxHistory>
++            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
++                <maxFileSize>10KB</maxFileSize>
++            </timeBasedFileNamingAndTriggeringPolicy>
+         </rollingPolicy>
+         <encoder>

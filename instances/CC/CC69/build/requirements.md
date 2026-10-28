@@ -1,0 +1,1 @@
+Build on ubuntu:22.04 with network access to Maven Central. The base layer installs OpenJDK 17 and Maven, then resolves the clean project's dependencies. The instance layer overlays the faulty pom.xml, which intentionally omits javax.transaction-api while retaining the Spring 5.3/Hibernate 6 dependency combination.

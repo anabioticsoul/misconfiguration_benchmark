@@ -1,0 +1,56 @@
+{
+  "instance_id": "CD89",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "child_logger_inherits_additivity_and_republishes_events_to_the_same_rolling_file_appender_attached_to_root"
+    },
+    "diagnosis_oracle": {
+      "component": "Log4j2 logger hierarchy"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/cd89/log4j2.xml",
+        "section": "Loggers/Logger[name=com.jarmel.pharmacy.controls.BarCodeOrderServlet]",
+        "option": "additivity"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/cd89/log4j2.xml"],
+    "required_modified_options": [
+      {
+        "path": "/opt/cd89/log4j2.xml",
+        "section": "Loggers/Logger[name=com.jarmel.pharmacy.controls.BarCodeOrderServlet]",
+        "option": "additivity"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not remove the logger operation, disable logging, or modify the Java test application"
+    ]
+  },
+  "observable_symptom": {
+    "command": "harness/repro.sh",
+    "expected_pre_fix": {
+      "exit_code": "zero",
+      "stderr_contains": ["duplicate log lines observed: 2"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "A single trace event is written exactly once to the configured Log4j2 file"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The real Log4j2 application remains runnable and emits the expected barcode-order event"
+      }
+    ]
+  }
+}

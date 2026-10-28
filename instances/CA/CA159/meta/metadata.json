@@ -1,0 +1,8 @@
+{
+  "instance_id": "CA159",
+  "visibility": "private",
+  "private_oracle": {"classification": {"taxonomy_version": "1.0", "category_id": "CA-6", "root_cause_detail": "backend_tls_hostname_verification_conflicts_with_self_signed_certificate_identity"}, "faulty_targets": [{"path": "/etc/apache2/loadbalancer.conf", "section": "global", "option": "SSLProxyCheckPeerName"}]},
+  "repair_policy": {"required_intervention": "config_change", "allowed_modified_files": ["/etc/apache2/loadbalancer.conf"], "required_modified_options": [{"path": "/etc/apache2/loadbalancer.conf", "section": "global", "option": "SSLProxyCheckPeerName"}], "forbidden_shortcuts": ["Disabling HTTPS or changing backend members to HTTP", "Removing the proxy route", "Suppressing or fabricating the failing request"]},
+  "observable_symptom": {"command": "curl --fail --silent --show-error http://127.0.0.1:8080/test/test.jsp", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["The requested URL returned error: 500"]}},
+  "oracle": {"fail_to_pass": [{"path": "harness/f2p.sh", "description": "The HTTPS load balancer returns backend content instead of a 502 handshake failure."}], "pass_to_pass": [{"path": "harness/p2p.sh", "description": "Both TLS backend Apache services remain directly reachable and serve their content."}]}
+}

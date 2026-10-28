@@ -1,0 +1,12 @@
+diff --git a/var/lib/postgresql/data/postgresql.conf b/var/lib/postgresql/data/postgresql.conf
+--- a/var/lib/postgresql/data/postgresql.conf
++++ b/var/lib/postgresql/data/postgresql.conf
+@@ -707,7 +707,7 @@
+ 					# encoding
+ 
+ # These settings are initialized by initdb, but they can be changed.
+-lc_messages = 'ru_RU.UTF-8'
++lc_messages = 'C'
+ 					# strings
+ lc_monetary = 'C.UTF-8'			# locale for monetary formatting
+ lc_numeric = 'C.UTF-8'			# locale for number formatting

@@ -1,0 +1,54 @@
+{
+  "instance_id": "CA9",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-5",
+      "root_cause_detail": "postgresql_listen_addresses_disables_tcp_listener"
+    },
+    "diagnosis_oracle": {
+      "component": "PostgreSQL server"
+    },
+    "faulty_targets": [
+      {
+        "path": "/var/lib/postgresql/data/postgresql.conf",
+        "section": "Connections and Authentication / Connection Settings",
+        "option": "listen_addresses"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/var/lib/postgresql/data/postgresql.conf"],
+    "required_modified_options": [
+      {
+        "path": "/var/lib/postgresql/data/postgresql.conf",
+        "section": "Connections and Authentication / Connection Settings",
+        "option": "listen_addresses"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not bypass PostgreSQL or replace it with a handwritten TCP responder", "Do not alter the harness or disable authentication"]
+  },
+  "observable_symptom": {
+    "command": "pg_isready -h 127.0.0.1 -p 5432",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["no response"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "PostgreSQL accepts a TCP readiness probe on 127.0.0.1:5432 after listen_addresses is repaired"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "PostgreSQL client utilities remain installed and usable"
+      }
+    ]
+  }
+}

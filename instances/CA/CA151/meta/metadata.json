@@ -1,0 +1,51 @@
+{
+  "instance_id": "CA151",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-3",
+      "root_cause_detail": "remote_mysqld_bind_address_remains_loopback_only"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/mysql/mysql.conf.d/zz-ca151.cnf",
+        "section": "mysqld",
+        "option": "bind-address"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/mysql/mysql.conf.d/zz-ca151.cnf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/mysql/mysql.conf.d/zz-ca151.cnf",
+        "section": "mysqld",
+        "option": "bind-address"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not bypass MySQL TCP configuration with an SSH tunnel or alter the client command to use a Unix socket."]
+  },
+  "observable_symptom": {
+    "command": "mysql -h $(hostname -I | awk '{print $1}') -P 3306 -u ca151 -pca151 -e 'SELECT 1'",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["ERROR 2003", "(111)"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "MySQL accepts an authenticated TCP connection on the container address after bind-address is repaired."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "MySQL remains available through its local Unix socket before and after the repair."
+      }
+    ]
+  }
+}

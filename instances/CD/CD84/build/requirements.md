@@ -1,0 +1,1 @@
+Use mysql/mysql-server:8.0.27 as the clean upstream image. Initialize its standard datadir during the base layer, then introduce only the unusable socket-directory configuration. The runtime must remain inspectable when mysqld cannot start.

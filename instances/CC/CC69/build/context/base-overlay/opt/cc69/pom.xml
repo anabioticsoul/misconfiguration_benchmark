@@ -1,0 +1,14 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>example</groupId><artifactId>cc69</artifactId><version>1.0</version>
+  <properties><maven.compiler.source>11</maven.compiler.source><maven.compiler.target>11</maven.compiler.target></properties>
+  <dependencies>
+    <dependency><groupId>org.springframework</groupId><artifactId>spring-core</artifactId><version>5.3.19</version></dependency>
+    <dependency><groupId>org.springframework</groupId><artifactId>spring-context</artifactId><version>5.3.19</version></dependency>
+    <dependency><groupId>org.springframework</groupId><artifactId>spring-orm</artifactId><version>5.3.19</version></dependency>
+    <dependency><groupId>org.hibernate.orm</groupId><artifactId>hibernate-core</artifactId><version>6.0.1.Final</version></dependency>
+    <dependency><groupId>mysql</groupId><artifactId>mysql-connector-java</artifactId><version>8.0.29</version></dependency>
+    <dependency><groupId>org.hibernate.javax.persistence</groupId><artifactId>hibernate-jpa-2.1-api</artifactId><version>1.0.2.Final</version></dependency>
+  </dependencies>
+  <build><plugins><plugin><groupId>org.codehaus.mojo</groupId><artifactId>exec-maven-plugin</artifactId><version>3.1.0</version><configuration><mainClass>example.App</mainClass></configuration></plugin></plugins></build>
+</project>

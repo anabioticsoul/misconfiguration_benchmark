@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CD93",
+  "images": {
+    "source": "mysql/mysql-server:8.0.27",
+    "base": "cd93:base",
+    "output": "cd93:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "instance": "build/context/scripts/instance.sh"
+  },
+  "archive": "image/CD93.tar.gz"
+}

@@ -1,0 +1,1 @@
+Use the clean official Apache Hadoop 3.3.6 image. The base layer provides a deterministic single-node Hadoop configuration under /opt/hadoop/etc/hadoop. The instance layer must overlay only the malformed core-site.xml configuration; do not copy harnesses or benchmark metadata into the image.

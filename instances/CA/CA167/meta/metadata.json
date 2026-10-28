@@ -1,0 +1,51 @@
+{
+  "instance_id": "CA167",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-6",
+      "root_cause_detail": "apache_listener_port_does_not_match_default_phpmyadmin_url"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/apache2/ports.conf",
+        "section": "global",
+        "option": "Listen"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/apache2/ports.conf", "/etc/apache2/sites-available/000-default.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/apache2/ports.conf",
+        "section": "global",
+        "option": "Listen"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not change MySQL or phpMyAdmin database settings", "Do not bypass Apache with another web server"]
+  },
+  "observable_symptom": {
+    "command": "curl --noproxy '*' --connect-timeout 3 http://127.0.0.1/",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Connection refused"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Apache serves the default HTTP response on the default localhost URL"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "Apache configuration remains syntactically valid and Apache serves on its configured listener"
+      }
+    ]
+  }
+}

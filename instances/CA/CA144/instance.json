@@ -1,0 +1,77 @@
+{
+  "instance_id": "CA144",
+  "benchmark": "MisconfigBench",
+  "version": "0.2",
+  "task_type": "misconfig_troubleshooting",
+  "software": {
+    "name": "Nginx",
+    "version": "1.25.5"
+  },
+  "source": {
+    "type": "docker_image",
+    "url": "https://hub.docker.com/_/nginx"
+  },
+  "image": {
+    "name": "ca144:latest",
+    "archive": "image/CA144.tar.gz",
+    "archive_format": "docker_save_tar_gzip",
+    "load_command": "docker load -i",
+    "distribution": {
+      "type": "docker_registry",
+      "reference": "docker.io/heliopolis0124/misconfigbench-ca144:v0.2",
+      "digest": "sha256:e383907efcefde803e79f48773848f25c04a73b1f72a616ce2d3395fa8416ad7",
+      "pull_reference": "docker.io/heliopolis0124/misconfigbench-ca144@sha256:e383907efcefde803e79f48773848f25c04a73b1f72a616ce2d3395fa8416ad7"
+    }
+  },
+  "runtime": {
+    "ready_check": "test -f /etc/nginx/conf.d/default.conf",
+    "ready_timeout_seconds": 60
+  },
+  "task_files": {
+    "public_problem_statement": "meta/description.md",
+    "private_metadata": "meta/metadata.json",
+    "reference_patch": "meta/gold_patch.diff",
+    "fail_to_pass": [
+      "harness/f2p.sh"
+    ],
+    "pass_to_pass": [
+      "harness/p2p.sh"
+    ]
+  },
+  "prompt_protocol": {
+    "template": "prompts/misconfig_troubleshooting.j2",
+    "case_prompt": "meta/description.md"
+  },
+  "builder_protocol": {
+    "template": "prompts/instance_builder.j2",
+    "spec": "build/build.json",
+    "requirements": "build/requirements.md"
+  },
+  "evaluator_harness": {
+    "visibility": "private",
+    "reproduce": "harness/repro.sh",
+    "fail_to_pass": [
+      "harness/f2p.sh"
+    ],
+    "pass_to_pass": [
+      "harness/p2p.sh"
+    ],
+    "delivery": "host_controlled_ephemeral_container"
+  },
+  "host_harness": {
+    "evaluate_prediction": "harness/eval_patch.sh"
+  },
+  "patch_protocol": {
+    "format": "unified_diff",
+    "baseline_source": "fresh_faulty_container",
+    "apply_workdir": "dynamic_host_staging_root",
+    "apply_command": "git apply --unsafe-paths",
+    "container_delivery": "copy_allowed_configuration_files_only"
+  },
+  "success_criteria": {
+    "patch_applies": true,
+    "evaluation_script_exit_code": 0,
+    "only_allowed_files_modified": true,
+    "required_configuration_option_modified": true
+  }
+}

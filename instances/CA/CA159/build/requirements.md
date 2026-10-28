@@ -1,0 +1,1 @@
+Build from ubuntu:22.04. Install Apache HTTP Server, OpenSSL, curl, and required proxy/SSL modules. Configure two local HTTPS backend Apache instances and one HTTP frontend load balancer. The faulty overlay must differ only in the frontend configuration and must preserve HTTPS backend proxying.

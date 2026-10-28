@@ -1,0 +1,59 @@
+{
+  "instance_id": "CA171",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-6",
+      "root_cause_detail": "mysql_server_autocommit_disabled_while_application_requires_automatic_commit"
+    },
+    "diagnosis_oracle": {
+      "component": "MySQL server"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/mysql/conf.d/ca171.cnf",
+        "section": "mysqld",
+        "option": "autocommit"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/mysql/conf.d/ca171.cnf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/mysql/conf.d/ca171.cnf",
+        "section": "mysqld",
+        "option": "autocommit"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Adding an explicit PDO commit or changing application transaction logic",
+      "Replacing PDO with mysqli or bypassing the prepared statement",
+      "Changing database contents directly instead of repairing the server option",
+      "Modifying any file other than the allowed MySQL configuration file"
+    ]
+  },
+  "observable_symptom": {
+    "command": "php /opt/ca171/reproduce.php",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Update was not persisted"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "A prepared PDO update persists automatically without an explicit commit after the MySQL autocommit setting is repaired."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The database remains reachable and the teams table remains queryable before and after the repair."
+      }
+    ]
+  }
+}

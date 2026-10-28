@@ -1,0 +1,12 @@
+{
+  "instance_id": "CA11",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {"taxonomy_version": "1.0", "category_id": "CA-6", "root_cause_detail": "oauth_client_secret_lacks_delegating_password_encoder_id"},
+    "diagnosis_oracle": {"component": "Spring OAuth2 client details service"},
+    "faulty_targets": [{"path": "/opt/ca11/application.properties", "section": "oauth.client", "option": "oauth.client.secret"}]
+  },
+  "repair_policy": {"required_intervention": "config_change", "allowed_modified_files": ["/opt/ca11/application.properties"], "required_modified_options": [{"path": "/opt/ca11/application.properties", "section": "oauth.client", "option": "oauth.client.secret"}], "forbidden_shortcuts": ["Do not disable authentication or replace the OAuth token endpoint", "Do not change the user password or remove the client"]},
+  "observable_symptom": {"command": "curl -sS -u test:secret -d grant_type=password -d username=user -d password=password http://127.0.0.1:8080/oauth/token", "expected_pre_fix": {"exit_code": 0, "http_status_min": 400, "log_path": "/tmp/ca11-application.log", "log_contains": ["There is no PasswordEncoder mapped for the id \"null\""]}},
+  "oracle": {"fail_to_pass": [{"path": "harness/f2p.sh", "description": "Password grant token issuance succeeds with the configured OAuth client after its secret uses the Spring Security storage format"}], "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The OAuth token endpoint remains protected against unauthenticated requests"}]}
+}

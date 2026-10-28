@@ -1,0 +1,6 @@
+[HDP-2.3.4.7]
+name=HDP-2.3.4.7
+baseurl=http://myproxy:8888/HDP/centos7/2.x/updates/2.3.4.7
+path=/
+enabled=1
+gpgcheck=0

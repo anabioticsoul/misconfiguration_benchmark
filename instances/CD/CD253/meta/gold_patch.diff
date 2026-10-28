@@ -1,0 +1,15 @@
+diff --git a/etc/php/7.4/fpm/pool.d/www.conf b/etc/php/7.4/fpm/pool.d/www.conf
+index 8f0e8d1..c4d9e42 100644
+--- a/etc/php/7.4/fpm/pool.d/www.conf
++++ b/etc/php/7.4/fpm/pool.d/www.conf
+@@ -3,8 +3,8 @@
+ group = shell_user
+ 
+ listen = /run/php/php7.4-fpm.sock
+-listen.owner = www-data
+-listen.group = www-data
++listen.owner = shell_user
++listen.group = shell_user
+ listen.mode = 0660
+ 
+ pm = ondemand

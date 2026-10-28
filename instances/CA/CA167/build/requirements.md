@@ -1,0 +1,1 @@
+Build an Ubuntu 22.04 image with Apache HTTP Server installed. The base layer must contain a valid default Apache site listening on port 80. The instance fault layer changes only Apache listener configuration so the default localhost URL does not reach Apache, while preserving valid Apache configuration. Do not install or start MySQL; database port settings are out of scope.

@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CA102",
+  "images": {
+    "source": "nginx:1.25.5",
+    "base": "ca102:base",
+    "output": "ca102:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "instance": "build/context/scripts/instance.sh"
+  },
+  "archive": "image/CA102.tar.gz"
+}

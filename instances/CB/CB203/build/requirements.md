@@ -1,0 +1,1 @@
+Use the official nginx:1.25.5 image. Install curl for behavioral harnesses, generate a deterministic local test certificate, and configure a clean HTTP redirect plus HTTPS endpoint. The fault overlay must make the port 80 listener use TLS, producing Nginx's real plain-HTTP-to-HTTPS-port 400 response. Do not copy benchmark metadata or harness files into the image.

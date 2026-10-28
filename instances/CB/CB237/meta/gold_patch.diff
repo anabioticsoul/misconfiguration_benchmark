@@ -1,0 +1,13 @@
+diff --git a/opt/cb237/pg_service.conf b/opt/cb237/pg_service.conf
+index 0000000..0000000 100644
+--- a/opt/cb237/pg_service.conf
++++ b/opt/cb237/pg_service.conf
+@@ -1,7 +1,7 @@
+ [raw_data]
+ host=127.0.0.1
+-port=5434
++port=5432
+ dbname=raw_data
+ user=my_username
+ password=my_password
+ sslmode=disable

@@ -1,0 +1,10 @@
+diff --git a/etc/ambari-agent/conf/ambari-agent.ini b/etc/ambari-agent/conf/ambari-agent.ini
+index 8a0c7c1..a5ab9d2 100644
+--- a/etc/ambari-agent/conf/ambari-agent.ini
++++ b/etc/ambari-agent/conf/ambari-agent.ini
+@@ -1,4 +1,4 @@
+ [repository]
+-repo_proxy_mode = per_repo_file
++repo_proxy_mode = ambari_cluster_version
+ repo_base_url = http://myproxy:8888
+ repo_host = public-repo-1.hortonworks.com

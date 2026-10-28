@@ -1,0 +1,8 @@
+--- a/opt/cd89/log4j2.xml
++++ b/opt/cd89/log4j2.xml
+@@ -14,4 +14,4 @@
+         <Root level="error"><AppenderRef ref="ROLLING_FILE"/></Root>
+-        <Logger name="com.jarmel.pharmacy.controls.BarCodeOrderServlet" level="trace">
++        <Logger name="com.jarmel.pharmacy.controls.BarCodeOrderServlet" level="trace" additivity="false">
+             <AppenderRef ref="ROLLING_FILE"/>
+         </Logger>

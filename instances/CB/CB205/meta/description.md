@@ -1,0 +1,1 @@
+Two web servers, nginx and Apache HTTPD, are intended to run in one Pod. The manifest declares nginx with containerPort 81 and Apache with containerPort 82, but only nginx starts and Apache repeatedly fails. Apache logs report `Address already in use` while trying to bind `0.0.0.0:80`. Diagnose the cause and repair the configuration so both servers can run.

@@ -1,0 +1,3 @@
+Build an Ubuntu 22.04 image containing Apache HTTP Server 2.4.34 built from the official source archive with the worker MPM. The base layer must contain a working Apache installation, a small real Apache module whose request handler exercises worker-thread stack depth, and a corrected ThreadStackSize setting. The instance layer replaces only httpd.conf with the intentionally undersized ThreadStackSize setting. Keep the container idle for investigation; harnesses start Apache themselves.
+
+The fault must be observable through a real HTTP request to the module, not through configuration-text inspection. The repair is limited to changing ThreadStackSize in /opt/apache/conf/httpd.conf.

@@ -1,0 +1,16 @@
+diff --git a/opt/camel/pom.xml b/opt/camel/pom.xml
+index 1111111..2222222 100644
+--- a/opt/camel/pom.xml
++++ b/opt/camel/pom.xml
+@@ -17,6 +17,11 @@
+       <artifactId>camel-core</artifactId>
+       <version>${camel.version}</version>
+     </dependency>
++    <dependency>
++      <groupId>org.apache.camel</groupId>
++      <artifactId>camel-spring-xml</artifactId>
++      <version>${camel.version}</version>
++    </dependency>
+     <dependency>
+       <groupId>org.springframework</groupId>
+       <artifactId>spring-context</artifactId>

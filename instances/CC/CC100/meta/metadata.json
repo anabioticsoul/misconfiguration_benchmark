@@ -1,0 +1,8 @@
+{
+  "instance_id": "CC100",
+  "visibility": "private",
+  "private_oracle": {"classification": {"taxonomy_version": "1.0", "category_id": "CC-2", "root_cause_detail": "spring_boot_template_engine_dependency_missing"}, "faulty_targets": [{"path": "/opt/cc100/pom.xml", "section": "dependencies", "option": "spring-boot-starter-thymeleaf"}]},
+  "repair_policy": {"required_intervention": "config_change", "allowed_modified_files": ["/opt/cc100/pom.xml"], "required_modified_options": [{"path": "/opt/cc100/pom.xml", "section": "dependencies", "option": "spring-boot-starter-thymeleaf"}], "forbidden_shortcuts": ["Do not change the controller to return a static resource or bypass template resolution"]},
+  "observable_symptom": {"command": "curl -fsS http://127.0.0.1:8080/", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["404"]}},
+  "oracle": {"fail_to_pass": [{"path": "harness/f2p.sh", "description": "Root page changes from template-resolution 404 to Hello response"}], "pass_to_pass": [{"path": "harness/p2p.sh", "description": "Application remains reachable and unrelated static behavior is preserved"}]}
+}

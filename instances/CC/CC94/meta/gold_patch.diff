@@ -1,0 +1,7 @@
+diff --git a/opt/cc94/app/system.properties b/opt/cc94/app/system.properties
+index 5f3c6e1..9d5d8c2 100644
+--- a/opt/cc94/app/system.properties
++++ b/opt/cc94/app/system.properties
+@@ -1 +1 @@
+-java.runtime.version=8
++java.runtime.version=17

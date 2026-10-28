@@ -1,0 +1,13 @@
+diff --git a/etc/apache2/sites-available/cd163.conf b/etc/apache2/sites-available/cd163.conf
+index 52c1a2d..6dc8f8d 100644
+--- a/etc/apache2/sites-available/cd163.conf
++++ b/etc/apache2/sites-available/cd163.conf
+@@ -4,7 +4,7 @@
+     ProxyPreserveHost On
+     ProxyPass / http://127.0.0.1:9000/
+     ProxyPassReverse / http://127.0.0.1:9000/
+-    ProxyErrorOverride On
++    ProxyErrorOverride Off
+     ErrorDocument 500 "The page cannot be displayed because an internal server error has occurred."
+     <Directory /var/www/html>
+         Require all granted

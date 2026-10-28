@@ -1,0 +1,1 @@
+Build from ubuntu:22.04. Install the distribution Apache HTTP Server package and configure a small protected `/writing` resource using basic authentication. The instance fault must disable only Apache's authorization core module load, leaving the authentication configuration intact for diagnosis and repair.

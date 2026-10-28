@@ -1,8 +1,282 @@
 {
     "version": "0.2.0",
     "configurations": [
+
         {
-            "name": "Builder Agent",
+            "name": "RQ1: Troubleshooter batch (OpenAI Subscription)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": [
+                "--task", "troubleshooter", "--evidence-mode", "none",
+                "--all", "--verify-timeout", "120",
+                "--llm-provider", "openai_subscription", "--subscription-login",
+                "--model", "gpt-5.6-luna",
+                "--max-iterations", "30", "--agent-timeout", "900"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ1: Troubleshooter batch (OpenLux API - Openai)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": [
+                "--task", "troubleshooter", "--evidence-mode", "none",
+                "--all", "--verify-timeout", "120",
+                "--llm-provider", "openlux",
+                "--model", "gpt-5.6-luna",
+                "--max-iterations", "30", "--agent-timeout", "900"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ1: Troubleshooter batch (OpenLux API - Anthropic)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": [
+                "--task", "troubleshooter", "--evidence-mode", "none",
+                "--all", "--verify-timeout", "120",
+                "--llm-provider", "openlux",
+                "--model", "claude-sonnet-5",
+                "--max-iterations", "30", "--agent-timeout", "900"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ1: Troubleshooter batch (OpenLux API - Deepseek)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": [
+                "--task", "troubleshooter", "--evidence-mode", "none",
+                "--all", "--verify-timeout", "120",
+                "--llm-provider", "openlux",
+                "--model", "deepseek-v4-flash",
+                "--max-iterations", "30", "--agent-timeout", "900"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ1: Troubleshooter score (offline)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": [
+                "--task", "troubleshooter",
+                "${input:instanceId}",
+                "--diagnosis-file", "${input:diagnosisFile}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ1: Troubleshooter report",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.troubleshooter.report",
+            "args": ["--runs-dir", "${input:diagnosisRunsDir}"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ2: Fixer batch (OpenAI Subscription)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": [
+                "--task", "fixer",
+                "--repair-context", "root_cause",
+                "--all",
+                "--verify-timeout", "120",
+                "--max-iterations", "40",
+                "--agent-timeout", "900",
+                "--llm-provider",
+                "openai_subscription",
+                "--subscription-login",
+                "--model",
+                "gpt-5.6-luna"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ2: Fixer batch (OpenLux API)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": [
+                "--task", "fixer",
+                "--repair-context", "root_cause",
+                "--all",
+                "--verify-timeout", "120",
+                "--max-iterations", "40",
+                "--agent-timeout", "900",
+                "--llm-provider",
+                "openlux",
+                "--model",
+                "gpt-5.6-luna"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ3: Evidence collection (OpenAI Subscription)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": [
+                "--task", "troubleshooter",
+                "--evidence-mode", "collect",
+                "--all",
+                "--verify-timeout", "120",
+                "--llm-provider",
+                "openai_subscription",
+                "--subscription-login",
+                "--model",
+                "gpt-5.6-luna",
+                "--max-iterations",
+                "30",
+                "--agent-timeout",
+                "900"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ3: Evidence collection (OpenLux API)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": [
+                "--task", "troubleshooter",
+                "--evidence-mode", "collect",
+                "--all",
+                "--verify-timeout", "120",
+                "--llm-provider",
+                "openlux",
+                "--model",
+                "gpt-5.6-luna",
+                "--max-iterations",
+                "30",
+                "--agent-timeout",
+                "900"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ3: Evidence replay batch (OpenAI Subscription)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": [
+                "--task", "troubleshooter", "--all",
+                "--evidence-mode", "replay",
+                "--evidence-pack-dir", "${input:evidencePackDir}",
+                "--evidence-condition", "${input:evidenceCondition}",
+                "--llm-provider", "openai_subscription", "--subscription-login",
+                "--model", "gpt-5.6-luna",
+                "--max-iterations", "30", "--agent-timeout", "900"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ3: Evidence replay batch (OpenLux API)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": [
+                "--task", "troubleshooter", "--all",
+                "--evidence-mode", "replay",
+                "--evidence-pack-dir", "${input:evidencePackDir}",
+                "--evidence-condition", "${input:evidenceCondition}",
+                "--llm-provider", "openlux", "--model", "gpt-5.6-luna",
+                "--max-iterations", "30", "--agent-timeout", "900"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ2/RQ3: Prepare annotation draft",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.annotations",
+            "args": ["${input:instanceId}", "--output", "${input:annotationOutput}"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ3: Prepare evidence pack",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.troubleshooter.evidence_pack",
+            "args": ["${input:instanceId}", "--observations", "${input:observationsFile}",
+                     "--output", "${input:annotationOutput}"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ3: Score human evidence review (offline)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.run_case",
+            "args": ["--task", "troubleshooter", "${input:instanceId}",
+                     "--diagnosis-file", "${input:diagnosisFile}",
+                     "--evidence-mode", "collect", "--observations-file", "${input:observationsFile}",
+                     "--evidence-review", "${input:evidenceReviewFile}"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "RQ2/RQ3: Grouped report",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.evaluator.report",
+            "args": ["--runs-dir", "${input:diagnosisRunsDir}"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Builder Agent (OpenAI Subscription)",
             "type": "debugpy",
             "request": "launch",
             "python": "/Applications/miniconda3/envs/openhands/bin/python",
@@ -12,6 +286,8 @@
                 "--agent",
                 "openhands",
                 "--regenerate",
+                "--llm-provider",
+                "openai_subscription",
                 "--subscription-login",
                 "--model",
                 "gpt-5.6-luna"
@@ -21,36 +297,98 @@
             "justMyCode": true
         },
         {
-            "name": "Verifier Agent",
+            "name": "Builder Agent (OpenLux API)",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.builder.run_case",
+            "args": [
+                "${input:instanceId}",
+                "--agent",
+                "openhands",
+                "--regenerate",
+                "--llm-provider",
+                "openlux",
+                "--model",
+                "gpt-5.6-luna"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Verifier: Consistency review (OpenAI Subscription)",
             "type": "debugpy",
             "request": "launch",
             "python": "/Applications/miniconda3/envs/openhands/bin/python",
             "module": "agents.verifier.run_case",
             "args": [
-                "${input:instanceId}"
+                "${input:instanceId}",
+                "--llm-provider", "openai_subscription", "--subscription-login",
+                "--model", "gpt-5.6-luna", "--max-iterations", "30", "--agent-timeout", "900"
             ],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "justMyCode": true
         },
         {
-            "name": "Fixer Agent",
+            "name": "Verifier: Consistency review (OpenLux API)",
             "type": "debugpy",
             "request": "launch",
             "python": "/Applications/miniconda3/envs/openhands/bin/python",
-            "module": "agents.fixer.run_case",
-            "args": [
-                "${input:instanceId}",
-                "--subscription-login",
-                "--model",
-                "gpt-5.6-luna"
-            ],
+            "module": "agents.verifier.run_case",
+            "args": ["${input:instanceId}", "--llm-provider", "openlux",
+                     "--model", "gpt-5.6-luna", "--max-iterations", "30", "--agent-timeout", "900"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Builder: Validate existing instance",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/Applications/miniconda3/envs/openhands/bin/python",
+            "module": "agents.builder.run_case",
+            "args": ["${input:instanceId}", "--validate-only", "--validation-timeout", "180"],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "justMyCode": true
         }
     ],
     "inputs": [
+        {
+            "id": "evidenceCondition", "type": "pickString",
+            "description": "RQ3 frozen evidence condition",
+            "options": ["full", "description_only", "key_only", "key_removed", "matched_control"],
+            "default": "full"
+        },
+        {
+            "id": "evidencePackDir", "type": "promptString",
+            "description": "Directory containing reviewed <ID>.json evidence packs"
+        },
+        {
+            "id": "observationsFile", "type": "promptString",
+            "description": "Path to evidence_observations.jsonl"
+        },
+        {
+            "id": "annotationOutput", "type": "promptString",
+            "description": "New JSON output path (existing files are not overwritten)"
+        },
+        {
+            "id": "evidenceReviewFile", "type": "promptString",
+            "description": "Reviewed claim support JSON matching this diagnosis and ledger"
+        },
+        {
+            "id": "diagnosisFile",
+            "type": "promptString",
+            "description": "Path to the saved diagnosis JSON for the selected case"
+        },
+        {
+            "id": "diagnosisRunsDir",
+            "type": "promptString",
+            "description": "Runs directory to summarize (automatically grouped by provider/model)",
+            "default": "${workspaceFolder}/runs"
+        },
         {
             "id": "instanceId",
             "type": "promptString",

@@ -1,0 +1,12 @@
+diff --git a/etc/nginx/conf.d/default.conf b/etc/nginx/conf.d/default.conf
+--- a/etc/nginx/conf.d/default.conf
++++ b/etc/nginx/conf.d/default.conf
+@@ -1,6 +1,6 @@
+ server {
+-    listen 80 ssl;
+-    listen [::]:80 ssl;
++    listen 80;
++    listen [::]:80;
+     server_name app1.internal.example.com;
+     ssl_certificate /etc/nginx/test.crt;
+     ssl_certificate_key /etc/nginx/test.key;

@@ -1,0 +1,51 @@
+{
+  "instance_id": "CA107",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-5",
+      "root_cause_detail": "limit_req_zone_rate_is_one_request_per_minute_but_requirement_is_ten"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/nginx/nginx.conf",
+        "section": "http",
+        "option": "limit_req_zone"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/nginx/nginx.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/nginx/nginx.conf",
+        "section": "http",
+        "option": "limit_req_zone"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not remove rate limiting", "Do not change the request key away from CLIENT_KEY"]
+  },
+  "observable_symptom": {
+    "command": "nginx -T 2>&1",
+    "expected_pre_fix": {
+      "exit_code": "zero",
+      "stderr_contains": ["syntax is ok"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The configured CLIENT_KEY rate is corrected to ten requests per minute while preserving the zone and key."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "Nginx configuration remains syntactically valid and retains header-keyed limiting with a 429 limit request status."
+      }
+    ]
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "instance_id": "CD4",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "server_max_allowed_packet_option_misinterpreted_as_client_only_setting"
+    },
+    "diagnosis_oracle": {
+      "component": "MySQL server"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/mysql/conf.d/cd4-fault.cnf",
+        "section": "mysqld",
+        "option": "max_allowed_packet"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/mysql/conf.d/cd4-fault.cnf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/mysql/conf.d/cd4-fault.cnf",
+        "section": "mysqld",
+        "option": "max_allowed_packet"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not replace or bypass the MySQL import command",
+      "Do not modify the dump, schema, or harness",
+      "Do not disable MySQL server startup or packet validation"
+    ]
+  },
+  "observable_symptom": {
+    "command": "mysql --protocol=socket --socket=/run/mysqld/mysqld.sock -uroot cd4db < /opt/cd4/dump.sql",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Got a packet bigger than 'max_allowed_packet' bytes", "line 149351"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The large SQL import fails with the packet-related disconnect before repair and completes with one imported row after max_allowed_packet is raised."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The initialized MySQL server remains reachable and the prepared database and table remain queryable."
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+config=/etc/php/8.1/cli/php.ini
+configured=$(awk -F= '/^[[:space:]]*html_errors[[:space:]]*=/{gsub(/[[:space:]]/,"",$2); print tolower($2); exit}' "$config")
+effective=$(php -r 'echo ini_get("html_errors") ? "on" : "off";')
+if [ "$configured" = "on" ] && [ "$effective" = "off" ]; then
+  printf '%s\n' 'configured html_errors=On but effective value is Off' >&2
+  exit 0
+fi
+printf '%s\n' 'expected PHP CLI configuration mismatch was not observed' >&2
+exit 1

@@ -1,0 +1,58 @@
+{
+  "instance_id": "CA115",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-3",
+      "root_cause_detail": "runtime_source_override_of_global_error_reporting_setting"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/ca115/app.php",
+        "section": "PHP source code",
+        "option": "error_reporting"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/ca115/app.php"],
+    "required_modified_options": [
+      {
+        "path": "/opt/ca115/app.php",
+        "section": "PHP source code",
+        "option": "error_reporting"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not remove or rename the PHP application.",
+      "Do not disable all PHP errors or hide the warning that should remain visible.",
+      "Do not change the harness, install a replacement PHP binary, or modify files outside the allowed path."
+    ]
+  },
+  "observable_symptom": {
+    "command": "php /opt/ca115/app.php",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": [
+        "Deprecated: strlen(): Passing null to parameter",
+        "Warning: Undefined variable"
+      ]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The application no longer emits the deprecation after its source-level override is removed, while its warning remains visible."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "PHP remains installed and the application warning remains observable before and after repair."
+      }
+    ]
+  }
+}

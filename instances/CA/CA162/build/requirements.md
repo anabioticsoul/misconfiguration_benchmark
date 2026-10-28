@@ -1,0 +1,1 @@
+Use the clean apache/spark:3.5.1 image. Copy the base overlay into /opt/misconfigbench. The runtime job must perform a real local Spark ORC write, inspect the produced ORC footer through Spark's bundled ORC library, and fail when the configured codec is not SNAPPY. The fault overlay replaces only the ORC configuration with the incorrect Hive-style option.

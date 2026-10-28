@@ -1,0 +1,58 @@
+{
+  "instance_id": "CB83",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CB-2",
+      "root_cause_detail": "apache_has_an_unintended_listen_80_declaration_competing_with_nginx"
+    },
+    "diagnosis_oracle": {
+      "component": "Apache HTTP Server listener configuration"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/apache2/conf-enabled/legacy-listen.conf",
+        "section": "global server configuration",
+        "option": "Listen"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/apache2/conf-enabled/legacy-listen.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/apache2/conf-enabled/legacy-listen.conf",
+        "section": "global server configuration",
+        "option": "Listen"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not stop or remove nginx",
+      "Do not change the intended Apache port in /etc/apache2/ports.conf",
+      "Do not replace Apache or nginx with a handwritten server"
+    ]
+  },
+  "observable_symptom": {
+    "command": "start nginx on port 80, then start apache2ctl -DFOREGROUND",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["could not bind to address"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Apache starts alongside nginx, and nginx proxies the request to Apache on port 8080"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The nginx health endpoint remains available on port 80"
+      }
+    ]
+  }
+}

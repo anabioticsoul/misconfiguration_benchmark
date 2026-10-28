@@ -1,0 +1,8 @@
+{
+  "instance_id": "CC53",
+  "visibility": "private",
+  "private_oracle": {"classification": {"taxonomy_version": "1.0", "category_id": "CC-2", "root_cause_detail": "apache_authorization_core_module_missing"}, "faulty_targets": [{"path": "/etc/apache2/mods-enabled/authz_core.load", "section": "LoadModule", "option": "authz_core_module"}]},
+  "repair_policy": {"required_intervention": "config_change", "allowed_modified_files": ["/etc/apache2/mods-enabled/authz_core.load"], "required_modified_options": [{"path": "/etc/apache2/mods-enabled/authz_core.load", "section": "LoadModule", "option": "authz_core_module"}], "forbidden_shortcuts": ["Do not remove authentication directives or bypass Require checks", "Do not replace Apache with another server"]},
+  "observable_symptom": {"command": "apache2ctl -t", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["Invalid command 'Require'"]}},
+  "oracle": {"fail_to_pass": [{"path": "harness/f2p.sh", "description": "Apache configuration test and authenticated request succeed after authz_core is loaded"}], "pass_to_pass": [{"path": "harness/p2p.sh", "description": "Apache configuration retains the protected directory and existing password database"}]}
+}

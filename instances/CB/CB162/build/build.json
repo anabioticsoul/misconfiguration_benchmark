@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CB162",
+  "images": {
+    "source": "ubuntu:22.04",
+    "base": "cb162:base",
+    "output": "cb162:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh"
+  },
+  "archive": "image/CB162.tar.gz"
+}

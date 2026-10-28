@@ -1,0 +1,7 @@
+diff --git a/opt/ca163/query.conf b/opt/ca163/query.conf
+index 3c99c8a..1d5c4a2 100644
+--- a/opt/ca163/query.conf
++++ b/opt/ca163/query.conf
+@@ -1,2 +1 @@
+ [streaming]
+-checkpointLocation=/tmp/ca163-checkpoint

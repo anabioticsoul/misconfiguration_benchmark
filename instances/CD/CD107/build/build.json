@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CD107",
+  "images": {
+    "source": "ubuntu:22.04",
+    "base": "cd107:base",
+    "output": "cd107:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh",
+    "instance": "build/context/scripts/instance.sh"
+  },
+  "archive": "image/CD107.tar.gz"
+}

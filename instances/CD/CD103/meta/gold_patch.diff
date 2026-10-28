@@ -1,0 +1,23 @@
+diff --git a/etc/nginx/conf.d/drupal.conf b/etc/nginx/conf.d/drupal.conf
+--- a/etc/nginx/conf.d/drupal.conf
++++ b/etc/nginx/conf.d/drupal.conf
+@@ -1,18 +1,19 @@
+ server {
+     listen 80 default_server;
+     server_name example.test;
+     root /var/www/example.com;
+     index index.php;
+     error_page 404 /index.php;
+ 
+     location / {
+         try_files $uri $uri/ /index.php?$query_string;
+     }
+ 
+     location ~ \.php$ {
++        try_files $fastcgi_script_name /index.php?$query_string;
+         fastcgi_pass unix:/run/php/php-fpm.sock;
+         fastcgi_index index.php;
+         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+         include fastcgi_params;
+     }
+ }

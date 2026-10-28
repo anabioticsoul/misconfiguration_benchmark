@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CD218",
+  "images": {
+    "source": "ubuntu:22.04",
+    "base": "cd218:base",
+    "output": "cd218:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh"
+  },
+  "archive": "image/CD218.tar.gz"
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CA167",
+  "images": {
+    "source": "ubuntu:22.04",
+    "base": "ca167:base",
+    "output": "ca167:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh"
+  },
+  "archive": "image/CA167.tar.gz"
+}

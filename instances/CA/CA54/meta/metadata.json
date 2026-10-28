@@ -1,0 +1,54 @@
+{
+  "instance_id": "CA54",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-1",
+      "root_cause_detail": "core-site.xml contains a second top-level configuration element"
+    },
+    "diagnosis_oracle": {
+      "component": "Hadoop core-site configuration"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/hadoop/etc/hadoop/core-site.xml",
+        "section": "configuration",
+        "option": "duplicate_configuration_root"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/hadoop/etc/hadoop/core-site.xml"],
+    "required_modified_options": [
+      {
+        "path": "/opt/hadoop/etc/hadoop/core-site.xml",
+        "section": "configuration",
+        "option": "duplicate_configuration_root"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not replace or bypass Hadoop binaries", "Do not suppress the XML parser failure", "Do not modify files outside core-site.xml"]
+  },
+  "observable_symptom": {
+    "command": "/opt/hadoop/bin/hdfs getconf -confKey fs.defaultFS",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Illegal to have multiple roots"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Hadoop configuration lookup succeeds once core-site.xml is well-formed"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The Hadoop installation and target configuration file remain present and usable"
+      }
+    ]
+  }
+}

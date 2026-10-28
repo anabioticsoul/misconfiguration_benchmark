@@ -1,0 +1,13 @@
+diff --git a/etc/apache2/loadbalancer.conf b/etc/apache2/loadbalancer.conf
+index 1111111..2222222 100644
+--- a/etc/apache2/loadbalancer.conf
++++ b/etc/apache2/loadbalancer.conf
+@@ -3,7 +3,7 @@
+     SSLProxyEngine on
+     SSLProxyVerify optional_no_ca
+     SSLProxyCheckPeerCN off
+-    SSLProxyCheckPeerName on
++    SSLProxyCheckPeerName off
+     ProxyPass /test balancer://testcluster
+     ProxyPassReverse /test balancer://testcluster
+     <Proxy balancer://testcluster>

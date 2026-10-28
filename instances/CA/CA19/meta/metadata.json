@@ -1,0 +1,51 @@
+{
+  "instance_id": "CA19",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-3",
+      "root_cause_detail": "userSettings_section_group_declaration_missing"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/ca19/SurveyClient.exe.config",
+        "section": "configuration/configSections",
+        "option": "userSettings"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/ca19/SurveyClient.exe.config"],
+    "required_modified_options": [
+      {
+        "path": "/opt/ca19/SurveyClient.exe.config",
+        "section": "configuration/configSections",
+        "option": "userSettings"
+      }
+    ],
+    "forbidden_shortcuts": ["Removing userSettings or bypassing configuration loading", "Replacing the executable or harness"]
+  },
+  "observable_symptom": {
+    "command": "mono /opt/ca19/SurveyClient.exe",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Unrecognized configuration section userSettings"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The configuration client loads successfully and the application reads its user-scoped setting."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The built application and Mono runtime remain present and executable."
+      }
+    ]
+  }
+}

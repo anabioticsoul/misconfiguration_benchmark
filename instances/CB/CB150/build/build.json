@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CB150",
+  "images": {
+    "source": "nginx:1.25.5",
+    "base": "cb150:base",
+    "output": "cb150:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh",
+    "instance": "build/context/scripts/instance.sh"
+  },
+  "archive": "image/CB150.tar.gz"
+}

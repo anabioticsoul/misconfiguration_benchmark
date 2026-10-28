@@ -1,0 +1,22 @@
+{
+  "instance_id": "CD84",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {"taxonomy_version": "1.0", "category_id": "CD-2", "root_cause_detail": "configured_socket_path_unusable_for_mysql_server"},
+    "faulty_targets": [{"path": "/etc/my.cnf", "section": "mysqld", "option": "socket"}]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/my.cnf"],
+    "required_modified_options": [{"path": "/etc/my.cnf", "section": "mysqld", "option": "socket"}],
+    "forbidden_shortcuts": ["Do not run the server as root", "Do not remove socket authentication or replace MySQL with a fixture"]
+  },
+  "observable_symptom": {
+    "command": "mysqld --defaults-file=/etc/my.cnf --user=mysql --datadir=/var/lib/mysql --skip-networking",
+    "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["Unable to setup unix socket lock file"]}
+  },
+  "oracle": {
+    "fail_to_pass": [{"path": "harness/f2p.sh", "description": "MySQL starts and accepts a local socket ping after the socket path is corrected"}],
+    "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The configured port and non-root MySQL execution remain intact"}]
+  }
+}

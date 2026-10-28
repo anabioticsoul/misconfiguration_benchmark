@@ -1,0 +1,1 @@
+Build on ubuntu:22.04. Install the distribution Mono compiler and runtime, compile the small System.Configuration client from the base overlay, and then apply the faulty executable configuration overlay. The final container must remain alive for inspection while harnesses invoke the real Mono application.

@@ -1,0 +1,12 @@
+diff --git a/etc/nginx/nginx.conf b/etc/nginx/nginx.conf
+--- a/etc/nginx/nginx.conf
++++ b/etc/nginx/nginx.conf
+@@ -6,7 +6,7 @@
+ }
+ http {
+     access_log off;
+-    limit_req_zone $http_CLIENT_KEY zone=newzone:10m rate=1r/m;
++    limit_req_zone $http_CLIENT_KEY zone=newzone:10m rate=10r/m;
+     server {
+         listen 80;
+         limit_req zone=newzone burst=9 nodelay;

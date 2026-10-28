@@ -1,0 +1,1 @@
+Use the clean official nginx:1.25.5 image. Replace its default virtual-host configuration with the supplied faulty configuration. Keep the final container alive for investigation because nginx -t is intentionally expected to fail until the configuration is repaired. Do not copy benchmark metadata or harness files into the image.

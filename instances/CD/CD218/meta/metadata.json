@@ -1,0 +1,57 @@
+{
+  "instance_id": "CD218",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "xdebug_v3_legacy_options_do_not_enable_debug_mode"
+    },
+    "diagnosis_oracle": {
+      "component": "Xdebug"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/php/8.1/cli/conf.d/99-xdebug.ini",
+        "section": "global",
+        "option": "xdebug.mode"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/php/8.1/cli/conf.d/99-xdebug.ini"],
+    "required_modified_options": [
+      {
+        "path": "/etc/php/8.1/cli/conf.d/99-xdebug.ini",
+        "section": "global",
+        "option": "xdebug.mode"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not uninstall or bypass Xdebug; correct the Xdebug 3 configuration instead.",
+      "Do not replace PHP or the Xdebug extension with a synthetic debugger implementation."
+    ]
+  },
+  "observable_symptom": {
+    "command": "php -d display_errors=0 -r 'xdebug_break(); if (strpos((string) ini_get(\"xdebug.mode\"), \"debug\") === false) { fwrite(STDERR, \"Xdebug debugger mode is not enabled\\n\"); exit(1); }'",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Xdebug debugger mode is not enabled"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "A PHP process can invoke Xdebug's breakpoint operation with debugger mode enabled."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The installed Xdebug extension remains loadable by PHP before and after repair."
+      }
+    ]
+  }
+}

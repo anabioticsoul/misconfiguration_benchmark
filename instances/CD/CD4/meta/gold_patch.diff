@@ -1,0 +1,8 @@
+diff --git a/etc/mysql/conf.d/cd4-fault.cnf b/etc/mysql/conf.d/cd4-fault.cnf
+index 8a3d9a1..f10b6d2 100644
+--- a/etc/mysql/conf.d/cd4-fault.cnf
++++ b/etc/mysql/conf.d/cd4-fault.cnf
+@@ -1,2 +1,2 @@
+ [mysqld]
+-max_allowed_packet=1M
++max_allowed_packet=64M

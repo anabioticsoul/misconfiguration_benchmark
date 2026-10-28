@@ -1,0 +1,62 @@
+{
+  "instance_id": "CA139",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-3",
+      "root_cause_detail": "The PHP memory override is placed in config/etc/php7/conf.d instead of DDEV's .ddev/php scan directory"
+    },
+    "diagnosis_oracle": {
+      "component": "PHP runtime"
+    },
+    "faulty_targets": [
+      {
+        "path": "/var/www/html/.ddev/php/memlimit.ini",
+        "section": "PHP",
+        "option": "memory_limit"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": [
+      "/var/www/html/.ddev/php/memlimit.ini"
+    ],
+    "required_modified_options": [
+      {
+        "path": "/var/www/html/.ddev/php/memlimit.ini",
+        "section": "PHP",
+        "option": "memory_limit"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Modify the export program or launcher instead of PHP configuration",
+      "Delete or bypass the product export operation",
+      "Change Docker host memory rather than the PHP memory_limit"
+    ]
+  },
+  "observable_symptom": {
+    "command": "/usr/local/bin/ca139-export",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": [
+        "Allowed memory size of 1073741824 bytes exhausted"
+      ]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The real PHP export allocation fails at the faulty 1G limit and succeeds after the DDEV PHP override is added"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The PHP runtime, export launcher, and original application-side configuration remain present"
+      }
+    ]
+  }
+}

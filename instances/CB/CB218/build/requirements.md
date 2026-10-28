@@ -1,0 +1,1 @@
+Build from ubuntu:22.04. Install a pinned OpenJDK runtime/compiler using the distribution package, compile the small application fixture, and copy the faulty Spring-style properties file. The container must remain available for investigation while harnesses launch the application explicitly. Do not copy benchmark metadata or harnesses into the image.

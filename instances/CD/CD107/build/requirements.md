@@ -1,0 +1,1 @@
+The fixture uses Ubuntu 22.04 with Maven and the distribution JDK. Maven resolves the pinned Hibernate dependencies from Maven Central during image construction. The base layer contains a small real Hibernate bootstrap program; the instance layer compiles it and installs the faulty properties file.

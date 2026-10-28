@@ -1,0 +1,1 @@
+The clean base is nginx:1.25.5. The base layer must configure Nginx to listen on the reverse-proxy backend port 8080. The instance layer must introduce only the documented fault: change the server listen port to 80. Keep the image's normal Nginx foreground startup behavior and do not copy benchmark harnesses or metadata into the image.

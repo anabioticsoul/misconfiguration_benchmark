@@ -1,0 +1,9 @@
+diff --git a/etc/php/8.1/cli/conf.d/99-xdebug.ini b/etc/php/8.1/cli/conf.d/99-xdebug.ini
+--- a/etc/php/8.1/cli/conf.d/99-xdebug.ini
++++ b/etc/php/8.1/cli/conf.d/99-xdebug.ini
+@@ -1,3 +1,2 @@
+-; Legacy Xdebug 2 settings are ignored by Xdebug 3.
+-xdebug_remote_enable=1
+-xdebug_autostart=1
++; Xdebug 3 debugger mode.
++xdebug.mode=debug

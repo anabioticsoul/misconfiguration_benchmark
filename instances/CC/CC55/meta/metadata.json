@@ -1,0 +1,61 @@
+{
+  "instance_id": "CC55",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CC-2",
+      "root_cause_detail": "module_spring_facet_and_context_mapping_absent"
+    },
+    "diagnosis_oracle": {
+      "component": "IntelliJ IDEA Spring facet"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/intellij-fixture/project/.idea/modules/app.iml",
+        "section": "component name=\"FacetManager\"",
+        "option": "Spring facet context-file mapping"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": [
+      "/opt/intellij-fixture/project/.idea/modules/app.iml"
+    ],
+    "required_modified_options": [
+      {
+        "path": "/opt/intellij-fixture/project/.idea/modules/app.iml",
+        "section": "component name=\"FacetManager\"",
+        "option": "Spring facet context-file mapping"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not suppress the warning or replace the module configuration with a different project file."
+    ]
+  },
+  "observable_symptom": {
+    "command": "/usr/local/bin/intellij-spring-check",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": [
+        "Unmapped Spring configuration files found.",
+        "Please configure/setup Spring facet for modules"
+      ]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The IntelliJ project check succeeds after the module Spring facet maps applicationContext.xml."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The Maven project and its Spring application context remain present and structurally valid."
+      }
+    ]
+  }
+}

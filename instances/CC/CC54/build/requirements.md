@@ -1,0 +1,1 @@
+Build from ubuntu:22.04. The base layer must provide Python 3 and the executable deployment configuration checker at /opt/cc54/check.py. The fault layer supplies the MVC-style web.config containing the unavailable System.Web.Helpers assembly declaration. Do not copy benchmark metadata or harness files into the image.

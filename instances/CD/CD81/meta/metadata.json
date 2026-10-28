@@ -1,0 +1,54 @@
+{
+  "instance_id": "CD81",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "LANG is set to a valid Russian locale although English diagnostics are required"
+    },
+    "diagnosis_oracle": {
+      "component": "GCC"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/profile.d/cd81-locale.sh",
+        "section": "shell environment",
+        "option": "LANG"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/profile.d/cd81-locale.sh"],
+    "required_modified_options": [
+      {
+        "path": "/etc/profile.d/cd81-locale.sh",
+        "section": "shell environment",
+        "option": "LANG"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not replace GCC, alter the source program, or pass a one-off locale override instead of changing the persistent LANG setting"]
+  },
+  "observable_symptom": {
+    "command": "bash -lc 'source /etc/profile; gcc -Wall -Woverflow /tmp/cd81-repro/fixture.c -o /tmp/cd81-repro/fixture'",
+    "expected_pre_fix": {
+      "exit_code": "zero",
+      "stderr_contains": ["предупреждение"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "GCC diagnostics change from Russian to English after the persistent locale setting is repaired"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The GCC installation and diagnostic fixture remain intact"
+      }
+    ]
+  }
+}

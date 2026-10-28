@@ -1,0 +1,54 @@
+{
+  "instance_id": "CA56",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-5",
+      "root_cause_detail": "gzip_types_includes_default_text_html"
+    },
+    "diagnosis_oracle": {
+      "component": "nginx gzip module"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/nginx/conf.d/ca56.conf",
+        "section": "http",
+        "option": "gzip_types"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/nginx/conf.d/ca56.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/nginx/conf.d/ca56.conf",
+        "section": "http",
+        "option": "gzip_types"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not disable gzip or replace the Nginx executable."]
+  },
+  "observable_symptom": {
+    "command": "nginx -t",
+    "expected_pre_fix": {
+      "exit_code": "zero",
+      "stderr_contains": ["duplicate MIME type \"text/html\""]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Nginx configuration testing no longer reports the duplicate text/html MIME warning."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The gzip_types directive remains configured and Nginx configuration remains syntactically valid."
+      }
+    ]
+  }
+}

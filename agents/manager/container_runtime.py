@@ -71,9 +71,21 @@ class ContainerRuntime:
             self._run(["docker", "rm", "-f", self.container_name], check=False)
             self.started = False
 
-    def execute(self, command: str, *, timeout_seconds: int = 30) -> CommandResult:
+    def execute(
+        self,
+        command: str,
+        *,
+        timeout_seconds: int = 30,
+        user: str | None = None,
+    ) -> CommandResult:
+        docker_command = ["docker", "exec"]
+        if user:
+            docker_command.extend(["--user", user])
+        docker_command.extend(
+            [self.container_name, "bash", "-lc", command]
+        )
         completed = self._run(
-            ["docker", "exec", self.container_name, "bash", "-lc", command],
+            docker_command,
             check=False,
             timeout_seconds=timeout_seconds,
         )

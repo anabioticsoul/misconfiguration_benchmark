@@ -1,0 +1,27 @@
+{
+  "instance_id": "CC81",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CC-1",
+      "root_cause_detail": "spring_boot_2_0_cglib_incompatible_with_modern_java_module_access"
+    },
+    "diagnosis_oracle": {"component": "Java runtime module access"},
+    "faulty_targets": [{"path": "/etc/springboot/java.options", "section": "JVM options", "option": "--add-opens=java.base/java.lang=ALL-UNNAMED"}]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/springboot/java.options"],
+    "required_modified_options": [{"path": "/etc/springboot/java.options", "section": "JVM options", "option": "--add-opens=java.base/java.lang=ALL-UNNAMED"}],
+    "forbidden_shortcuts": ["Do not replace Java or Spring Boot, remove the application, or bypass the startup command"]
+  },
+  "observable_symptom": {
+    "command": "/opt/springboot/run.sh",
+    "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["InaccessibleObjectException", "does not open java.lang"]}
+  },
+  "oracle": {
+    "fail_to_pass": [{"path": "harness/f2p.sh", "description": "Spring Boot startup succeeds after the required module-open JVM option is restored"}],
+    "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The Java runtime and application artifact remain present and the fault is not bypassed"}]
+  }
+}

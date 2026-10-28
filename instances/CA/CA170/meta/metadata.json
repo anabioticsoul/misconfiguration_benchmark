@@ -1,0 +1,51 @@
+{
+  "instance_id": "CA170",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-6",
+      "root_cause_detail": "server_lc_messages_russian_conflicts_with_win1252_client_encoding"
+    },
+    "faulty_targets": [
+      {
+        "path": "/var/lib/postgresql/data/postgresql.conf",
+        "section": "server",
+        "option": "lc_messages"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/var/lib/postgresql/data/postgresql.conf"],
+    "required_modified_options": [
+      {
+        "path": "/var/lib/postgresql/data/postgresql.conf",
+        "section": "server",
+        "option": "lc_messages"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not change client encoding, suppress errors, or replace psql with a synthetic command"]
+  },
+  "observable_symptom": {
+    "command": "printf 'SELEC 1;\\n\\\\q\\n' | PGCLIENTENCODING=WIN1252 LC_ALL=C PAGER=cat psql -X -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres postgres",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["character with byte sequence", "WIN1252"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "A real malformed SQL command no longer produces the encoding-conversion error and reports the SQL syntax error"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "A valid SQL query continues to execute successfully"
+      }
+    ]
+  }
+}

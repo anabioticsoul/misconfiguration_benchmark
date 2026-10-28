@@ -13,6 +13,7 @@ from agents.manager.case import (
 from agents.manager.artifacts import build_prediction_patch
 from agents.manager import TAXONOMY_PATH
 from agents.manager.validation import ContractValidationError, load_case_documents
+from agents.manager.paths import instance_dir
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -22,7 +23,7 @@ class CaseDefinitionTest(unittest.TestCase):
     def test_taxonomy_category_must_match_instance_prefix(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_dir:
             case_dir = Path(temporary_dir) / "CA35"
-            shutil.copytree(REPO_ROOT / "instances" / "CA35", case_dir)
+            shutil.copytree(instance_dir(REPO_ROOT, "CA35"), case_dir)
             metadata_path = case_dir / "meta/metadata.json"
             metadata = json.loads(metadata_path.read_text())
             metadata["private_oracle"]["classification"]["category_id"] = "CD-2"
@@ -35,7 +36,7 @@ class CaseDefinitionTest(unittest.TestCase):
                 load_case_documents(case_dir)
 
     def test_ca35_loads_private_policy(self) -> None:
-        case = CaseDefinition.load(REPO_ROOT / "instances" / "CA35")
+        case = CaseDefinition.load(instance_dir(REPO_ROOT, "CA35"))
 
         self.assertEqual(case.instance_id, "CA35")
         self.assertEqual(case.image_name, "ca35:latest")
@@ -58,7 +59,7 @@ class CaseDefinitionTest(unittest.TestCase):
 
     def test_ca35_instance_does_not_describe_fault_injection(self) -> None:
         instance = json.loads(
-            (REPO_ROOT / "instances" / "CA35" / "instance.json").read_text()
+            (instance_dir(REPO_ROOT, "CA35") / "instance.json").read_text()
         )
 
         self.assertNotIn("bootstrap", instance["runtime"])
@@ -66,7 +67,7 @@ class CaseDefinitionTest(unittest.TestCase):
         self.assertNotIn("ready_log_contains", instance["runtime"])
 
     def test_service_failure_case_can_keep_container_running(self) -> None:
-        case = CaseDefinition.load(REPO_ROOT / "instances" / "CB116")
+        case = CaseDefinition.load(instance_dir(REPO_ROOT, "CB116"))
 
         command = case.docker_create_command("cb116-test")
 
@@ -91,7 +92,7 @@ class CaseDefinitionTest(unittest.TestCase):
 
     def test_ca35_uses_dynamic_baseline_and_behavior_tests(self) -> None:
         instance = json.loads(
-            (REPO_ROOT / "instances" / "CA35" / "instance.json").read_text()
+            (instance_dir(REPO_ROOT, "CA35") / "instance.json").read_text()
         )
 
         self.assertEqual(
@@ -120,7 +121,7 @@ class CaseDefinitionTest(unittest.TestCase):
     def test_ca35_classification_uses_taxonomy_id(self) -> None:
         taxonomy = json.loads(TAXONOMY_PATH.read_text())
         metadata = json.loads(
-            (REPO_ROOT / "instances" / "CA35" / "meta" / "metadata.json").read_text()
+            (instance_dir(REPO_ROOT, "CA35") / "meta" / "metadata.json").read_text()
         )
         category_ids = {
             subtype["id"]
@@ -164,7 +165,7 @@ class CaseDefinitionTest(unittest.TestCase):
         self.assertNotIn("KeyError", message)
 
     def test_prediction_patch_allows_arbitrary_valid_config_text(self) -> None:
-        case = CaseDefinition.load(REPO_ROOT / "instances" / "CA35")
+        case = CaseDefinition.load(instance_dir(REPO_ROOT, "CA35"))
         with tempfile.TemporaryDirectory() as temporary_dir:
             root = Path(temporary_dir)
             baseline = root / "baseline/etc/mysql/my.cnf"

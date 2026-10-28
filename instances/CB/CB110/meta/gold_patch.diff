@@ -1,0 +1,12 @@
+diff --git a/etc/nginx/conf.d/default.conf b/etc/nginx/conf.d/default.conf
+index 1111111..2222222 100644
+--- a/etc/nginx/conf.d/default.conf
++++ b/etc/nginx/conf.d/default.conf
+@@ -4,6 +4,6 @@ server {
+ 
+     location = /jenkins {
+         proxy_set_header Host $host;
+-        proxy_pass http://127.0.0.1:8082/jenkins;
++        proxy_pass http://127.0.0.1:8081/jenkins;
+     }
+ }

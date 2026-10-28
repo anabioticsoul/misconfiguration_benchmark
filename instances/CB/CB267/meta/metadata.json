@@ -1,0 +1,58 @@
+{
+  "instance_id": "CB267",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CB-1",
+      "root_cause_detail": "php_curl_shared_library_unreachable_without_runtime_library_search_path"
+    },
+    "diagnosis_oracle": {
+      "component": "PHP cURL extension"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/environment",
+        "section": "environment",
+        "option": "LD_LIBRARY_PATH"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/environment"],
+    "required_modified_options": [
+      {
+        "path": "/etc/environment",
+        "section": "environment",
+        "option": "LD_LIBRARY_PATH"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Modify the PHP reproduction command or application code",
+      "Install an alternative curl implementation or replace the PHP runtime",
+      "Bypass the curl_init() operation or alter the evaluation harness"
+    ]
+  },
+  "observable_symptom": {
+    "command": "set -a; . /etc/environment; set +a; php -d display_errors=1 -r 'curl_init();'",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Call to undefined function curl_init()"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "PHP can load the cURL extension and successfully create and close a curl handle"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The PHP CLI remains available and executes ordinary PHP code"
+      }
+    ]
+  }
+}

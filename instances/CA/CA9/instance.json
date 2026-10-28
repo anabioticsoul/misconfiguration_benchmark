@@ -1,0 +1,77 @@
+{
+  "instance_id": "CA9",
+  "benchmark": "MisconfigBench",
+  "version": "0.2",
+  "task_type": "misconfig_troubleshooting",
+  "software": {
+    "name": "PostgreSQL",
+    "version": "14"
+  },
+  "source": {
+    "type": "Stack Overflow",
+    "url": "https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-16-04"
+  },
+  "image": {
+    "name": "ca9:latest",
+    "archive": "image/CA9.tar.gz",
+    "archive_format": "docker_save_tar_gzip",
+    "load_command": "docker load -i",
+    "distribution": {
+      "type": "docker_registry",
+      "reference": "docker.io/heliopolis0124/misconfigbench-ca9:v0.2",
+      "digest": "sha256:9b789dd7946e8fba3f96b4470164b85a464903a2f2e0e2aa8f054092494242b4",
+      "pull_reference": "docker.io/heliopolis0124/misconfigbench-ca9@sha256:9b789dd7946e8fba3f96b4470164b85a464903a2f2e0e2aa8f054092494242b4"
+    }
+  },
+  "runtime": {
+    "ready_check": "pg_isready -h /var/run/postgresql -U postgres",
+    "ready_timeout_seconds": 60
+  },
+  "task_files": {
+    "public_problem_statement": "meta/description.md",
+    "private_metadata": "meta/metadata.json",
+    "reference_patch": "meta/gold_patch.diff",
+    "fail_to_pass": [
+      "harness/f2p.sh"
+    ],
+    "pass_to_pass": [
+      "harness/p2p.sh"
+    ]
+  },
+  "prompt_protocol": {
+    "template": "prompts/misconfig_troubleshooting.j2",
+    "case_prompt": "meta/description.md"
+  },
+  "builder_protocol": {
+    "template": "prompts/instance_builder.j2",
+    "spec": "build/build.json",
+    "requirements": "build/requirements.md"
+  },
+  "evaluator_harness": {
+    "visibility": "private",
+    "reproduce": "harness/repro.sh",
+    "fail_to_pass": [
+      "harness/f2p.sh"
+    ],
+    "pass_to_pass": [
+      "harness/p2p.sh"
+    ],
+    "delivery": "host_controlled_ephemeral_container"
+  },
+  "host_harness": {
+    "evaluate_prediction": "harness/eval_patch.sh"
+  },
+  "patch_protocol": {
+    "format": "unified_diff",
+    "baseline_source": "fresh_faulty_container",
+    "apply_workdir": "dynamic_host_staging_root",
+    "apply_command": "git apply --unsafe-paths",
+    "container_delivery": "copy_allowed_configuration_files_only"
+  },
+  "success_criteria": {
+    "patch_applies": true,
+    "evaluation_script_exit_code": 0,
+    "only_allowed_files_modified": true,
+    "required_configuration_option_modified": true
+  }
+}

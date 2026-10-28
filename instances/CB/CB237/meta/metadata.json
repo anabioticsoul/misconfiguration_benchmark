@@ -1,0 +1,58 @@
+{
+  "instance_id": "CB237",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CB-1",
+      "root_cause_detail": "postgresql_client_port_does_not_match_server_default_port"
+    },
+    "diagnosis_oracle": {
+      "component": "PostgreSQL client connection"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/cb237/pg_service.conf",
+        "section": "raw_data",
+        "option": "port"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/cb237/pg_service.conf"],
+    "required_modified_options": [
+      {
+        "path": "/opt/cb237/pg_service.conf",
+        "section": "raw_data",
+        "option": "port"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not change the PostgreSQL server port or start a second server on 5434",
+      "Do not bypass the service configuration by supplying a different port in the harness",
+      "Do not replace PostgreSQL with a handwritten protocol fixture"
+    ]
+  },
+  "observable_symptom": {
+    "command": "PGSERVICEFILE=/opt/cb237/pg_service.conf psql service=raw_data -c 'SELECT 1'",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Connection refused"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The configured PostgreSQL service connection reaches the real server and returns a query result after the port is corrected"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The real PostgreSQL server remains on port 5432 and the configured database and role remain usable"
+      }
+    ]
+  }
+}

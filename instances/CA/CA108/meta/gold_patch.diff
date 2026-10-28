@@ -1,0 +1,13 @@
+diff --git a/etc/nginx/nginx.conf b/etc/nginx/nginx.conf
+index 0000000..1111111 100644
+--- a/etc/nginx/nginx.conf
++++ b/etc/nginx/nginx.conf
+@@ -12,6 +12,7 @@ http {
+             add_header Access-Control-Allow-Origin *;
+             resolver 127.0.0.11 valid=1s;
+-            proxy_pass http://$1$is_args$args;
++            proxy_pass https://$1$is_args$args;
++            proxy_ssl_server_name on;
+             proxy_ssl_verify off;
+         }
+     }

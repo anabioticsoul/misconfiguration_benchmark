@@ -1,0 +1,8 @@
+{
+  "instance_id": "CB210",
+  "visibility": "private",
+  "private_oracle": {"classification": {"taxonomy_version": "1.0", "category_id": "CB-4", "root_cause_detail": "php_cli_memory_limit_exhausted_by_bulk_eloquent_style_result"}, "faulty_targets": [{"path": "/etc/php/8.1/cli/conf.d/99-cb210-memory.ini", "section": "PHP CLI runtime", "option": "memory_limit"}]},
+  "repair_policy": {"required_intervention": "config_change", "allowed_modified_files": ["/etc/php/8.1/cli/conf.d/99-cb210-memory.ini"], "required_modified_options": [{"path": "/etc/php/8.1/cli/conf.d/99-cb210-memory.ini", "section": "PHP CLI runtime", "option": "memory_limit"}], "forbidden_shortcuts": ["Do not remove the workload or reduce the row count", "Do not alter the harness or application", "Do not disable PHP memory accounting"]},
+  "observable_symptom": {"command": "php /opt/cb210/artisan questions:process", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["Allowed memory size"]}},
+  "oracle": {"fail_to_pass": [{"path": "harness/f2p.sh", "description": "The bulk question processing command fails under the faulty memory limit and succeeds after the limit is raised."}], "pass_to_pass": [{"path": "harness/p2p.sh", "description": "A single-row lookup remains successful before and after repair."}]}
+}

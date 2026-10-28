@@ -1,0 +1,55 @@
+{
+  "instance_id": "CA130",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-5",
+      "root_cause_detail": "ssl_virtual_host_certificate_path_references_missing_resource"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/apache2/sites-available/ca130.conf",
+        "section": "VirtualHost *:443",
+        "option": "SSLCertificateFile"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/apache2/sites-available/ca130.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/apache2/sites-available/ca130.conf",
+        "section": "VirtualHost *:443",
+        "option": "SSLCertificateFile"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not remove the SSL virtual host or disable mod_ssl",
+      "Do not create the missing certificate as a workaround",
+      "Do not modify files outside the declared Apache site configuration"
+    ]
+  },
+  "observable_symptom": {
+    "command": "apache2ctl configtest",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["missing-ca130.crt", "does not exist"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Apache configuration validates and starts with the SSL virtual host after its certificate path is repaired"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The enabled SSL virtual host, key, certificate, and mod_ssl remain present"
+      }
+    ]
+  }
+}

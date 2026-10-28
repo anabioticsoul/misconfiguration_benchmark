@@ -1,0 +1,13 @@
+diff --git a/opt/ca11/application.properties b/opt/ca11/application.properties
+index 4f1f8a1..b6c2e11 100644
+--- a/opt/ca11/application.properties
++++ b/opt/ca11/application.properties
+@@ -1,4 +1,4 @@
+-server.port=8080
+-oauth.client.id=test
+-oauth.client.secret=secret
+-oauth.client.scopes=read,write
++server.port=8080
++oauth.client.id=test
++oauth.client.secret={noop}secret
++oauth.client.scopes=read,write

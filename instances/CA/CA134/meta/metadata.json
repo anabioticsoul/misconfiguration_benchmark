@@ -1,0 +1,8 @@
+{
+  "instance_id": "CA134",
+  "visibility": "private",
+  "private_oracle": {"classification": {"taxonomy_version": "1.0", "category_id": "CA-2", "root_cause_detail": "server_sql_mode_option_name_not_accepted_in_configuration_context"}, "faulty_targets": [{"path": "/etc/mysql/mariadb.conf.d/99-ca134.cnf", "section": "mysqld", "option": "sql_mode"}]},
+  "repair_policy": {"required_intervention": "config_change", "allowed_modified_files": ["/etc/mysql/mariadb.conf.d/99-ca134.cnf"], "required_modified_options": [{"path": "/etc/mysql/mariadb.conf.d/99-ca134.cnf", "section": "mysqld", "option": "sql_mode"}], "forbidden_shortcuts": ["Do not change the application SQL", "Do not use a session-only SET command", "Do not remove or bypass the database service"]},
+  "observable_symptom": {"command": "mysql --protocol=socket -uroot ca134 -e \"INSERT INTO records (id, event_date) VALUES (2, '0000-00-00')\"", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["Incorrect date value"]}},
+  "oracle": {"fail_to_pass": [{"path": "harness/f2p.sh", "description": "A zero-date application insert succeeds after the persistent server SQL mode is repaired."}], "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The MariaDB service and pre-existing test schema remain available."}]}
+}

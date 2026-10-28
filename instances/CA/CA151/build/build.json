@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CA151",
+  "images": {
+    "source": "ubuntu:22.04",
+    "base": "ca151:base",
+    "output": "ca151:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh",
+    "instance": "build/context/scripts/instance.sh"
+  },
+  "archive": "image/CA151.tar.gz"
+}

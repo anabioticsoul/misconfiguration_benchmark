@@ -1,0 +1,69 @@
+{
+  "instance_id": "CD253",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "php_fpm_listen_socket_owner_group_do_not_match_apache_pool_user"
+    },
+    "diagnosis_oracle": {
+      "component": "PHP-FPM"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/php/7.4/fpm/pool.d/www.conf",
+        "section": "www",
+        "option": "listen.owner"
+      },
+      {
+        "path": "/etc/php/7.4/fpm/pool.d/www.conf",
+        "section": "www",
+        "option": "listen.group"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/php/7.4/fpm/pool.d/www.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/php/7.4/fpm/pool.d/www.conf",
+        "section": "www",
+        "option": "listen.owner"
+      },
+      {
+        "path": "/etc/php/7.4/fpm/pool.d/www.conf",
+        "section": "www",
+        "option": "listen.group"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not change Apache to run as www-data",
+      "Do not change the PHP-FPM pool user or group",
+      "Do not replace the Unix socket with a TCP listener",
+      "Do not grant broad permissions or manually chown the live socket"
+    ]
+  },
+  "observable_symptom": {
+    "command": "curl --fail -sS -o /tmp/cd253-repro-body -w '%{http_code}' http://127.0.0.1/index.php",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["503"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "A PHP request through Apache and the Unix PHP-FPM socket changes from the permission-denied 503 to HTTP 200 after the pool socket owner and group are repaired."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "PHP-FPM and Apache configuration validation, the shell_user pool identity, and direct PHP execution remain valid before and after the repair."
+      }
+    ]
+  }
+}

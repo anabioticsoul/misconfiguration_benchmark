@@ -1,0 +1,54 @@
+{
+  "instance_id": "CA144",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-6",
+      "root_cause_detail": "traefik_backend_port_does_not_match_nginx_listen_port"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/nginx/conf.d/default.conf",
+        "section": "server",
+        "option": "listen"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/nginx/conf.d/default.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/nginx/conf.d/default.conf",
+        "section": "server",
+        "option": "listen"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not remove Nginx or change the proxy architecture",
+      "Do not change the required backend port away from 8080"
+    ]
+  },
+  "observable_symptom": {
+    "command": "nginx -t && bash TCP probe of 127.0.0.1:8080",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Connection refused"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Nginx becomes reachable on the reverse proxy backend port 8080"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The Nginx configuration remains syntactically valid and serves the declared response"
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+diff --git a/opt/apache/conf/httpd.conf b/opt/apache/conf/httpd.conf
+--- a/opt/apache/conf/httpd.conf
++++ b/opt/apache/conf/httpd.conf
+@@ -28,9 +28,9 @@
+ <IfModule mpm_worker_module>
+     StartServers 1
+     MinSpareThreads 1
+     MaxSpareThreads 4
+     ThreadsPerChild 4
+     MaxRequestWorkers 4
+     MaxConnectionsPerChild 0
+-    ThreadStackSize 65536
++    ThreadStackSize 8888888
+ </IfModule>

@@ -1,0 +1,10 @@
+diff --git a/opt/ted-search/application.properties b/opt/ted-search/application.properties
+index 4b5a8aa..c8d6e91 100644
+--- a/opt/ted-search/application.properties
++++ b/opt/ted-search/application.properties
+@@ -1,5 +1,4 @@
+ server.port: 9191
+-spring.cache.type=GENERIC
+ memcached.cache.servers: memcached:11211
+ memcached.cache.mode: static
+ memcached.cache.expirations: 3600, oembed:3600

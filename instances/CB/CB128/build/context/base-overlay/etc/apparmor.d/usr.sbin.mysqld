@@ -1,0 +1,25 @@
+#include <tunables/global>
+
+/usr/sbin/mysqld {
+  #include <abstractions/base>
+  capability dac_override,
+  capability setgid,
+  capability setuid,
+  network tcp,
+
+  /usr/sbin/mysqld mr,
+  /usr/lib/mysql/plugin/*.so* mr,
+  /etc/mysql/** r,
+  /var/lib/mysql/ r,
+  /var/lib/mysql/** rwk,
+  /srv/mysql/ r,
+  /srv/mysql/myDB/ r,
+  /srv/mysql/myDB/** rwk,
+  /srv/mysql/logs/ r,
+  /srv/mysql/logs/** rw,
+  /srv/mysql/pids/ r,
+  /srv/mysql/pids/** rw,
+  /srv/mysql/sockets/ r,
+  /srv/mysql/sockets/** rw,
+  /tmp/** rw,
+}

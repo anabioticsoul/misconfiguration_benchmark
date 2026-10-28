@@ -1,0 +1,54 @@
+{
+  "instance_id": "CC54",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CC-2",
+      "root_cause_detail": "aspnet_mvc3_system_web_helpers_assembly_absent_from_deployment"
+    },
+    "diagnosis_oracle": {
+      "component": "ASP.NET MVC 3 System.Web.Helpers assembly"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/cc54/web.config",
+        "section": "configuration/system.web/compilation/assemblies",
+        "option": "add[assembly=System.Web.Helpers, Version=1.0.0.0]"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/cc54/web.config"],
+    "required_modified_options": [
+      {
+        "path": "/opt/cc54/web.config",
+        "section": "configuration/system.web/compilation/assemblies",
+        "option": "System.Web.Helpers assembly declaration"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not modify the checker or add a replacement assembly file."]
+  },
+  "observable_symptom": {
+    "command": "/opt/cc54/check.py",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Could not load file or assembly 'System.Web.Helpers, Version=1.0.0.0"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The deployed configuration checker succeeds after the missing MVC assembly reference is removed or supplied."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The configuration remains well-formed and retains the other MVC framework assembly declarations."
+      }
+    ]
+  }
+}

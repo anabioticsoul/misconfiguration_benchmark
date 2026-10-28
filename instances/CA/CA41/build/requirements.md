@@ -1,0 +1,1 @@
+Use the official nginx:1.15.2 image. Provision a self-signed certificate and clean HTTPS server configuration in the base layer; the fault overlay changes only the SSL listen syntax and adds the deprecated directive.

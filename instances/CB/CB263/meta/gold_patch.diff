@@ -1,0 +1,9 @@
+diff --git a/opt/hadoop/etc/hadoop/hdfs-site.xml b/opt/hadoop/etc/hadoop/hdfs-site.xml
+--- a/opt/hadoop/etc/hadoop/hdfs-site.xml
++++ b/opt/hadoop/etc/hadoop/hdfs-site.xml
+@@ -23,4 +23,4 @@
+   <property>
+     <name>dfs.datanode.du.reserved</name>
+-    <value>1000000000000000</value>
++    <value>0</value>
+   </property>

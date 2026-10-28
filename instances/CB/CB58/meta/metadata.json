@@ -1,0 +1,57 @@
+{
+  "instance_id": "CB58",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CB-4",
+      "root_cause_detail": "worker_thread_stack_exhaustion_due_to_insufficient_thread_stack_size"
+    },
+    "diagnosis_oracle": {
+      "component": "Apache HTTP Server mpm_worker"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/apache/conf/httpd.conf",
+        "section": "<IfModule mpm_worker_module>",
+        "option": "ThreadStackSize"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/apache/conf/httpd.conf"],
+    "required_modified_options": [
+      {
+        "path": "/opt/apache/conf/httpd.conf",
+        "section": "<IfModule mpm_worker_module>",
+        "option": "ThreadStackSize"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not replace httpd with a different server or remove the stack-sensitive module.",
+      "Do not disable the mpm_worker module or bypass the /stackprobe request."
+    ]
+  },
+  "observable_symptom": {
+    "command": "bash harness/repro.sh",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["AH00428", "exited with status"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "A stack-sensitive request no longer crashes the Apache worker child after ThreadStackSize is increased."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "Apache starts, serves its health endpoint, and continues serving the ordinary document."
+      }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "instance_id": "CC58",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CC-2",
+      "root_cause_detail": "camel_spring_xml_namespace_handler_dependency_missing"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/camel/pom.xml",
+        "section": "dependencies",
+        "option": "org.apache.camel:camel-spring-xml dependency"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/camel/pom.xml"],
+    "required_modified_options": [
+      {
+        "path": "/opt/camel/pom.xml",
+        "section": "dependencies",
+        "option": "org.apache.camel:camel-spring-xml dependency"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not replace the Spring XML application with a synthetic success command", "Do not remove the Camel XML context from spring.xml"]
+  },
+  "observable_symptom": {
+    "command": "cd /opt/camel && classpath=target/classes; while IFS= read -r jar; do case \"$jar\" in *camel-spring-xml-3.22.4.jar) ;; *) classpath=\"$classpath:$jar\" ;; esac; done < <(find \"$HOME/.m2/repository\" -type f -name '*.jar' | sort); java -cp \"$classpath\" com.example.Main",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Unable to locate Spring NamespaceHandler", "http://camel.apache.org/schema/spring"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The real Spring application loads the Camel XML namespace successfully after the missing module is declared."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The Maven project remains structurally valid and retains its real Spring XML resource before and after repair."
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+diff --git a/opt/hadoop/etc/hadoop/core-site.xml b/opt/hadoop/etc/hadoop/core-site.xml
+index 0000000..0000000 100644
+--- a/opt/hadoop/etc/hadoop/core-site.xml
++++ b/opt/hadoop/etc/hadoop/core-site.xml
+@@ -5,9 +5,3 @@
+     <value>hdfs://localhost:9000</value>
+   </property>
+ </configuration>
+-<configuration>
+-  <property>
+-    <name>fs.default.name</name>
+-    <value>hdfs://localhost:9000</value>
+-  </property>
+-</configuration>

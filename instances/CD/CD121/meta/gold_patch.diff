@@ -1,0 +1,7 @@
+diff --git a/opt/eclipse-workspace/.metadata/.plugins/org.eclipse.debug.ui/org.eclipse.debug.ui.prefs b/opt/eclipse-workspace/.metadata/.plugins/org.eclipse.debug.ui/org.eclipse.debug.ui.prefs
+index 4e4f3b1..c8e2c91 100644
+--- a/opt/eclipse-workspace/.metadata/.plugins/org.eclipse.debug.ui/org.eclipse.debug.ui.prefs
++++ b/opt/eclipse-workspace/.metadata/.plugins/org.eclipse.debug.ui/org.eclipse.debug.ui.prefs
+@@ -1 +1 @@
+-filterDeletedProjects=true
++filterDeletedProjects=false

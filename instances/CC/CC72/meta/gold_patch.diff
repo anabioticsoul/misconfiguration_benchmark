@@ -1,0 +1,12 @@
+diff --git a/opt/rector-demo/composer.json b/opt/rector-demo/composer.json
+index 3d2bd2a..dc78b7a 100644
+--- a/opt/rector-demo/composer.json
++++ b/opt/rector-demo/composer.json
+@@ -1,6 +1,6 @@
+ {
+   "require": {
+-    "php": ">=7.2.5",
++    "php": "^8.0",
+     "rector/rector": "0.14.6"
+   },
+   "config": {

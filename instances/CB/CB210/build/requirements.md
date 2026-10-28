@@ -1,0 +1,1 @@
+Build from ubuntu:22.04. Install PHP 8.1 CLI using Ubuntu packages. The base application must successfully process a 50,000-row in-memory question result with the normal CLI memory limit. The instance layer must introduce only a PHP CLI memory_limit configuration fault; no harness or benchmark files may enter the image.

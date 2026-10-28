@@ -43,7 +43,14 @@ class CaseDefinition:
         repo_root: Path | None = None,
     ) -> "CaseDefinition":
         case_dir = case_dir.resolve()
-        repo_root = repo_root.resolve() if repo_root else case_dir.parents[1]
+        if repo_root:
+            repo_root = repo_root.resolve()
+        else:
+            instances_root = next(
+                (parent for parent in case_dir.parents if parent.name == "instances"),
+                None,
+            )
+            repo_root = instances_root.parent if instances_root else case_dir.parents[1]
         instance, metadata = load_case_documents(case_dir)
         image = instance["image"]
         image_distribution = dict(image.get("distribution", {}))

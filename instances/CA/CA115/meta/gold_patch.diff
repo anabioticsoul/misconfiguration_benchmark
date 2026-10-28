@@ -1,0 +1,9 @@
+diff --git a/opt/ca115/app.php b/opt/ca115/app.php
+--- a/opt/ca115/app.php
++++ b/opt/ca115/app.php
+@@ -1,5 +1,4 @@
+ <?php
+-error_reporting(E_ALL);
+ $missing = $ca115_undefined;
+ $deprecated = strlen(null);
+ if ((error_reporting() & E_DEPRECATED) !== 0) {

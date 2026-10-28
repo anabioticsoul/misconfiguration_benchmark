@@ -1,0 +1,1 @@
+Build a minimal Spring Boot 2.6.3 REST application on Ubuntu 22.04. The faulty layer must retain the spring-boot-starter-security Maven dependency, which activates Spring Security's default authentication and makes the documented unauthenticated Postman request return 401. The repair is removal of that dependency only.

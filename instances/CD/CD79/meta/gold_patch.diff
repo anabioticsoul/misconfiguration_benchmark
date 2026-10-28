@@ -1,0 +1,12 @@
+diff --git a/etc/apache2/sites-available/000-default.conf b/etc/apache2/sites-available/000-default.conf
+--- a/etc/apache2/sites-available/000-default.conf
++++ b/etc/apache2/sites-available/000-default.conf
+@@ -1,7 +1,7 @@
+ <VirtualHost *:80>
+     DocumentRoot /srv/custom-root
+     <Directory /srv/custom-root>
+-        Require all denied
++        Require all granted
+         DirectoryIndex index.html
+     </Directory>
+ </VirtualHost>

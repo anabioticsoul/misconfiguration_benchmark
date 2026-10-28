@@ -1,0 +1,41 @@
+{
+  "instance_id": "CD121",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "deleted_project_filter_hides_existing_launch_configuration"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/eclipse-workspace/.metadata/.plugins/org.eclipse.debug.ui/org.eclipse.debug.ui.prefs",
+        "section": "org.eclipse.debug.ui",
+        "option": "filterDeletedProjects"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/eclipse-workspace/.metadata/.plugins/org.eclipse.debug.ui/org.eclipse.debug.ui.prefs"],
+    "required_modified_options": [
+      {
+        "path": "/opt/eclipse-workspace/.metadata/.plugins/org.eclipse.debug.ui/org.eclipse.debug.ui.prefs",
+        "section": "org.eclipse.debug.ui",
+        "option": "filterDeletedProjects"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not delete all launch configurations", "Do not rename the configuration", "Do not modify Eclipse binaries"]
+  },
+  "observable_symptom": {
+    "command": "/usr/local/bin/eclipse-config-check /opt/eclipse-workspace/.metadata/.plugins/org.eclipse.debug.core/.launches",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["A configuration with this name already exists"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [{"path": "harness/f2p.sh", "description": "The Equivalence Checker launch configuration becomes discoverable after disabling the deleted-project filter."}],
+    "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The launch file remains present and retains the Equivalence Checker label."}]
+  }
+}

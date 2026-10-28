@@ -1,0 +1,1 @@
+Use nginx 1.25.5. The base layer creates a local self-signed HTTPS upstream and a deterministic nginx configuration. The fault layer changes only the proxy protocol configuration; no harness or oracle files belong in the image.

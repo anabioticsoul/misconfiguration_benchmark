@@ -1,0 +1,26 @@
+{
+  "instance_id": "CD103",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "php_regex_location_forwards_nonexistent_script_instead_of_falling_back_to_application_router"
+    },
+    "faulty_targets": [{"path": "/etc/nginx/conf.d/drupal.conf", "section": "location ~ \\.php$", "option": "try_files"}]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/nginx/conf.d/drupal.conf"],
+    "required_modified_options": [{"path": "/etc/nginx/conf.d/drupal.conf", "section": "location ~ \\.php$", "option": "try_files"}],
+    "forbidden_shortcuts": ["Do not remove PHP handling, replace Drupal, or return a synthetic error without exercising the router"]
+  },
+  "observable_symptom": {
+    "command": "curl --fail-with-body -sS http://127.0.0.1/this-file-doesnt-exist.php 2>&1",
+    "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["File not found"]}
+  },
+  "oracle": {
+    "fail_to_pass": [{"path": "harness/f2p.sh", "description": "A nonexistent PHP URL is routed to Drupal and returns its 404 response instead of FastCGI's missing-input error"}],
+    "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The existing Drupal front controller remains reachable and returns its normal response"}]
+  }
+}

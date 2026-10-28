@@ -1,0 +1,3 @@
+Use ubuntu:22.04 as the clean source image. The base layer installs MySQL Server and PHP CLI with PDO MySQL support, initializes a real MySQL data directory, and creates the synthetic `ca171` database and `teams` table. The fault layer adds `/etc/mysql/conf.d/ca171.cnf` with `[mysqld] autocommit=0`.
+
+The runtime keeps the container alive with a shell because the harnesses start the real MySQL server with a case-local socket. The only repairable file is `/etc/mysql/conf.d/ca171.cnf`; changing its `autocommit` value to `1` is the intended repair. Benchmark metadata and harnesses are never copied into the image.

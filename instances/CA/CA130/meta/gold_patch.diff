@@ -1,0 +1,13 @@
+diff --git a/etc/apache2/sites-available/ca130.conf b/etc/apache2/sites-available/ca130.conf
+index 6c55c5f..d4e8f5a 100644
+--- a/etc/apache2/sites-available/ca130.conf
++++ b/etc/apache2/sites-available/ca130.conf
+@@ -3,7 +3,7 @@
+     ServerName ca130.example.test
+     DocumentRoot /var/www/html
+     SSLEngine on
+-    SSLCertificateFile /etc/apache2/ssl/missing-ca130.crt
++    SSLCertificateFile /etc/apache2/ssl/ca130.crt
+     SSLCertificateKeyFile /etc/apache2/ssl/ca130.key
+ </VirtualHost>
+ </IfModule>

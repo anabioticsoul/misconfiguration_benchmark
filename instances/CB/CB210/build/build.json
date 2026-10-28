@@ -1,0 +1,8 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CB210",
+  "images": {"source": "ubuntu:22.04", "base": "cb210:base", "output": "cb210:latest"},
+  "context_dir": "build/context",
+  "scripts": {"base": "build/context/scripts/base.sh", "instance": "build/context/scripts/instance.sh"},
+  "archive": "image/CB210.tar.gz"
+}

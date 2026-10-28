@@ -1,0 +1,1 @@
+Install the Ubuntu 22.04 MariaDB server and client packages. The base layer must contain a working database and a pre-created test table. The instance layer must introduce only the SQL-mode configuration fault; no harness or oracle files may enter the image.

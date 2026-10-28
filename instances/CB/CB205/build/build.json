@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CB205",
+  "images": {
+    "source": "ubuntu:22.04",
+    "base": "cb205:base",
+    "output": "cb205:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh"
+  },
+  "archive": "image/CB205.tar.gz"
+}

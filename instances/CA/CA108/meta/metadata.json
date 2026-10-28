@@ -1,0 +1,31 @@
+{
+  "instance_id": "CA108",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-6",
+      "root_cause_detail": "proxy_upstream_protocol_mismatch"
+    },
+    "faulty_targets": [
+      {"path": "/etc/nginx/nginx.conf", "section": "server/location ~ ^/(.*)$", "option": "proxy_pass"}
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/nginx/nginx.conf"],
+    "required_modified_options": [
+      {"path": "/etc/nginx/nginx.conf", "section": "server/location ~ ^/(.*)$", "option": "proxy_pass"},
+      {"path": "/etc/nginx/nginx.conf", "section": "server/location ~ ^/(.*)$", "option": "proxy_ssl_server_name"}
+    ],
+    "forbidden_shortcuts": ["Do not replace nginx or bypass the proxy with a synthetic response"]
+  },
+  "observable_symptom": {
+    "command": "curl -fsS http://127.0.0.1:8081/127.0.0.1:8443/hello",
+    "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["502"]}
+  },
+  "oracle": {
+    "fail_to_pass": [{"path": "harness/f2p.sh", "description": "Nginx forwards the HTTPS upstream request and returns its content"}],
+    "pass_to_pass": [{"path": "harness/p2p.sh", "description": "Nginx remains configured and responds on its proxy listener"}]
+  }
+}

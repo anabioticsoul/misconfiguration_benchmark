@@ -1,0 +1,8 @@
+diff --git a/etc/mysql/conf.d/fault.cnf b/etc/mysql/conf.d/fault.cnf
+index 9e5c0d1..1d2c4ef 100644
+--- a/etc/mysql/conf.d/fault.cnf
++++ b/etc/mysql/conf.d/fault.cnf
+@@ -1,2 +1,2 @@
+ [mysqld]
+-innodb_file_per_table=0
++innodb_file_per_table=1

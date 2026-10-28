@@ -1,0 +1,7 @@
+diff --git a/etc/nginx/conf.d/ca56.conf b/etc/nginx/conf.d/ca56.conf
+--- a/etc/nginx/conf.d/ca56.conf
++++ b/etc/nginx/conf.d/ca56.conf
+@@ -1,2 +1,2 @@
+ gzip on;
+-gzip_types text/plain text/html text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
++gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;

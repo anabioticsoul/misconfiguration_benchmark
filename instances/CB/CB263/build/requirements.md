@@ -1,0 +1,3 @@
+Use the clean `apache/hadoop:3.3.6` image. The base overlay configures a local NameNode and four real DataNode processes, each using a separate local HDFS data directory. The instance overlay changes only `dfs.datanode.du.reserved` to reserve substantially more space than the container filesystem provides. This keeps all four DataNodes registered while making block placement reject every target. Runtime harnesses start the real Hadoop daemons and exercise a real `hdfs dfs -put`; no protocol fixture is used.
+
+The container must remain an investigation shell. Do not copy benchmark metadata or harness files into the image.

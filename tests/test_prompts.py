@@ -3,8 +3,9 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from agents.fixer.prompts import render_case_prompt, resolve_prompt_template
+from agents.evaluator.fixer.prompts import render_case_prompt, resolve_prompt_template
 from agents.manager.case import CaseDefinition
+from agents.manager.paths import instance_dir
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -12,7 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 class PromptRenderingTest(unittest.TestCase):
     def test_ca35_uses_the_fixer_prompt_template(self) -> None:
-        case = CaseDefinition.load(REPO_ROOT / "instances" / "CA35")
+        case = CaseDefinition.load(instance_dir(REPO_ROOT, "CA35"))
 
         self.assertEqual(
             resolve_prompt_template(case),
@@ -20,7 +21,7 @@ class PromptRenderingTest(unittest.TestCase):
         )
 
     def test_ca35_task_prompt_is_rendered_from_template(self) -> None:
-        case = CaseDefinition.load(REPO_ROOT / "instances" / "CA35")
+        case = CaseDefinition.load(instance_dir(REPO_ROOT, "CA35"))
 
         prompt = render_case_prompt(case)
 

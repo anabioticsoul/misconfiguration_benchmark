@@ -1,0 +1,11 @@
+diff --git a/etc/apparmor.d/usr.sbin.mysqld b/etc/apparmor.d/usr.sbin.mysqld
+--- a/etc/apparmor.d/usr.sbin.mysqld
++++ b/etc/apparmor.d/usr.sbin.mysqld
+@@ -18,5 +18,7 @@
+   /srv/mysql/logs/ r,
+   /srv/mysql/logs/** rw,
+   /srv/mysql/pids/ r,
+   /srv/mysql/sockets/ r,
++  /srv/mysql/pids/mysqld-myDB.pid w,
++  /srv/mysql/sockets/mysql-myDB.sock w,
+   /tmp/** rw,

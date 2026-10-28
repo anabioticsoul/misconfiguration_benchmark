@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+launch_dir="${1:?launch directory required}"
+prefs="/opt/eclipse-workspace/.metadata/.plugins/org.eclipse.debug.ui/org.eclipse.debug.ui.prefs"
+launch="$launch_dir/Equivalence_Checker.launch"
+if [ ! -f "$prefs" ] || [ ! -f "$launch" ]; then
+  printf '%s\n' 'Eclipse debug preferences are missing' >&2
+  exit 2
+fi
+filter=$(awk -F= '$1 == "filterDeletedProjects" { print $2; exit }' "$prefs")
+project=$(sed -n 's/.*PROJECT_ATTR.*value="\([^"]*\)".*/\1/p' "$launch")
+label=$(sed -n 's/.*LABEL.*value="\([^"]*\)".*/\1/p' "$launch")
+if [ "$filter" = "true" ] && [ "$project" = "deleted-equivalence-project" ]; then
+  printf '%s\n' 'A configuration with this name already exists' >&2
+  exit 1
+fi
+if [ "$label" = "Equivalence Checker" ]; then
+  printf '%s\n' 'Equivalence Checker configuration is discoverable'
+  exit 0
+fi
+printf '%s\n' 'Expected launch configuration was not found' >&2
+exit 3

@@ -1,0 +1,8 @@
+diff --git a/etc/mysql/mariadb.conf.d/99-ca134.cnf b/etc/mysql/mariadb.conf.d/99-ca134.cnf
+index 1111111..2222222 100644
+--- a/etc/mysql/mariadb.conf.d/99-ca134.cnf
++++ b/etc/mysql/mariadb.conf.d/99-ca134.cnf
+@@ -1,2 +1,2 @@
+ [mysqld]
+-sql_mode=STRICT_TRANS_TABLES,NO_ZERO_DATE
++sql_mode=NO_ENGINE_SUBSTITUTION

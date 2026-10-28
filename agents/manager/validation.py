@@ -117,6 +117,18 @@ def load_case_documents(
             f"{metadata_path}: repair_policy.allowed_modified_files "
             "must be a non-empty array"
         )
+    diagnosis_oracle = metadata["private_oracle"].get("diagnosis_oracle")
+    if diagnosis_oracle is not None:
+        if not isinstance(diagnosis_oracle, dict):
+            raise ContractValidationError(
+                f"{metadata_path}: private_oracle.diagnosis_oracle must be an object"
+            )
+        component = diagnosis_oracle.get("component")
+        if not isinstance(component, str) or not component.strip():
+            raise ContractValidationError(
+                f"{metadata_path}: private_oracle.diagnosis_oracle.component "
+                "must be a non-empty string"
+            )
     return manifest, metadata
 
 

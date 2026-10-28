@@ -22,7 +22,7 @@ def export_public_dataset(repo_root: Path, output_dir: Path) -> Path:
     """Export public case data without private oracle or evaluator artifacts."""
     output_dir.mkdir(parents=True, exist_ok=True)
     records: list[dict[str, Any]] = []
-    for case_dir in sorted((repo_root / "instances").iterdir()):
+    for case_dir in sorted((repo_root / "instances").glob("*/*")):
         if not (case_dir / "instance.json").is_file():
             continue
         manifest, _ = load_case_documents(case_dir)

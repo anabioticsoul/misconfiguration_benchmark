@@ -1,0 +1,11 @@
+diff --git a/opt/cc54/web.config b/opt/cc54/web.config
+index 1111111..2222222 100644
+--- a/opt/cc54/web.config
++++ b/opt/cc54/web.config
+@@ -4,5 +4,4 @@
+       <assemblies>
+         <add assembly="System.Web.Abstractions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
+-        <add assembly="System.Web.Helpers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
+         <add assembly="System.Web.Routing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
+         <add assembly="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31BF3856AD364E35" />
+       </assemblies>

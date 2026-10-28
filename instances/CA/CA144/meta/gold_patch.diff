@@ -1,0 +1,13 @@
+diff --git a/etc/nginx/conf.d/default.conf b/etc/nginx/conf.d/default.conf
+index 0000000..1111111 100644
+--- a/etc/nginx/conf.d/default.conf
++++ b/etc/nginx/conf.d/default.conf
+@@ -1,7 +1,7 @@
+ server {
+-    listen 80;
++    listen 8080;
+ 
+     location / {
+         return 200 "nginx-ok\n";
+     }
+ }

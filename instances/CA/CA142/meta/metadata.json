@@ -1,0 +1,68 @@
+{
+  "instance_id": "CA142",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-2",
+      "root_cause_detail": "presto_s3_timeout_options_written_with_hadoop_dotted_names"
+    },
+    "diagnosis_oracle": {
+      "component": "Flink S3 Presto filesystem plugin"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/flink/flink-conf.yaml",
+        "section": "S3 configuration",
+        "option": "s3.connection.timeout"
+      },
+      {
+        "path": "/etc/flink/flink-conf.yaml",
+        "section": "S3 configuration",
+        "option": "s3.socket.timeout"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/flink/flink-conf.yaml"],
+    "required_modified_options": [
+      {
+        "path": "/etc/flink/flink-conf.yaml",
+        "section": "S3 configuration",
+        "option": "s3.connect-timeout"
+      },
+      {
+        "path": "/etc/flink/flink-conf.yaml",
+        "section": "S3 configuration",
+        "option": "s3.socket-timeout"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not replace the S3 Presto filesystem with the Hadoop S3 filesystem.",
+      "Do not disable checkpointing or remove the configured checkpoint and savepoint paths.",
+      "Do not modify the probe or harness files instead of correcting the configuration option names."
+    ]
+  },
+  "observable_symptom": {
+    "command": "/opt/flink/bin/checkpoint-probe",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["[checkpoint-probe] S3 read timed out"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The real AWS SDK checkpoint upload completes after the timeout options use the Presto names."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The filesystem state backend and s3p checkpoint and savepoint locations remain configured."
+      }
+    ]
+  }
+}

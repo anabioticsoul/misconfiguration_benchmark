@@ -1,0 +1,1 @@
+Build from ubuntu:22.04. Install PHP CLI and Composer, then install Rector 0.14.6 and its dependencies in /opt/rector-demo. The faulty layer must change only the project's PHP requirement from PHP 8 to the older PHP 7-compatible constraint while retaining the real Rector command and Doctrine annotation fixture.

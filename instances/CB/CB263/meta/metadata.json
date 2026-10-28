@@ -1,0 +1,58 @@
+{
+  "instance_id": "CB263",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CB-4",
+      "root_cause_detail": "dfs.datanode.du.reserved_exceeds_available_capacity"
+    },
+    "diagnosis_oracle": {
+      "component": "HDFS DataNode block placement"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/hadoop/etc/hadoop/hdfs-site.xml",
+        "section": "configuration",
+        "option": "dfs.datanode.du.reserved"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/hadoop/etc/hadoop/hdfs-site.xml"],
+    "required_modified_options": [
+      {
+        "path": "/opt/hadoop/etc/hadoop/hdfs-site.xml",
+        "section": "configuration",
+        "option": "dfs.datanode.du.reserved"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not remove or bypass the HDFS DataNode service",
+      "Do not change the reproduction or harness files",
+      "Do not reduce the replication requirement instead of restoring writable DataNode capacity"
+    ]
+  },
+  "observable_symptom": {
+    "command": "printf 'segment-121 payload for CB263\\n' >/tmp/cb263-payload && /opt/misconfigbench/start-hadoop.sh && HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop /opt/hadoop/bin/hdfs dfs -mkdir -p /user/hadoop/cb263-input && HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop /opt/hadoop/bin/hdfs dfs -put -f /tmp/cb263-payload /user/hadoop/cb263-input/segment-121",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["could only be replicated to 0 nodes instead of minReplication (=1)"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "A real HDFS put operation succeeds after DataNodes regain writable capacity"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The NameNode and all four DataNodes remain live and HDFS remains queryable"
+      }
+    ]
+  }
+}

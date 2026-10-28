@@ -1,0 +1,10 @@
+diff --git a/etc/apache2/ports.conf b/etc/apache2/ports.conf
+index 1111111..2222222 100644
+--- a/etc/apache2/ports.conf
++++ b/etc/apache2/ports.conf
+@@ -1,4 +1,4 @@
+-Listen 80
++Listen 8080
+ 
+ <IfModule ssl_module>
+ 	Listen 443

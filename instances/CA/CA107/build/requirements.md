@@ -1,0 +1,1 @@
+Build from the official nginx:1.25.5 image. The base layer must contain a valid header-keyed nginx limit request configuration at 10 requests per minute. The instance layer changes only that rate to 1 request per minute. Keep nginx installed and leave the final container running for investigation; do not copy harnesses or benchmark metadata into the image.

@@ -1,0 +1,9 @@
+fs.allowed-fallback-filesystems: s3p
+state.backend: filesystem
+state.checkpoints.dir: s3p://gamma-flink-test-checkpoint/checkpoints/
+state.backend.fs.checkpointdir: s3p://gamma-flink-test-checkpoint/checkpoints/
+state.savepoints.dir: s3p://gamma-flink-test-checkpoint/savepoints/
+state.backend.fs.savepointdir: s3p://gamma-flink-test-checkpoint/savepoints/
+s3.connection.timeout: 600000
+s3.socket.timeout: 600000
+s3.connection.establish.timeout: 600000

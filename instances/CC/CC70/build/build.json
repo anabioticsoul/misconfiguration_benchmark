@@ -1,0 +1,8 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CC70",
+  "images": {"source": "ubuntu:22.04", "base": "cc70:base", "output": "cc70:latest"},
+  "context_dir": "build/context",
+  "scripts": {"base": "build/context/scripts/base.sh", "instance": "build/context/scripts/instance.sh"},
+  "archive": "image/CC70.tar.gz"
+}

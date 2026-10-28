@@ -1,0 +1,1 @@
+Use the clean nginx:1.15.2 image and add one configuration file under /etc/nginx/conf.d/. The instance must reproduce Nginx's duplicate MIME type warning caused by explicitly listing text/html in gzip_types. Keep the container alive for investigation because the normal service is not started by the runtime command. Do not copy benchmark metadata or harness files into the image.

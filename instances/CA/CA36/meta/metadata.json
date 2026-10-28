@@ -1,0 +1,54 @@
+{
+  "instance_id": "CA36",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-1",
+      "root_cause_detail": "invalid_vimscript_mapleader_assignment_syntax"
+    },
+    "diagnosis_oracle": {
+      "component": "Vim configuration parser"
+    },
+    "faulty_targets": [
+      {
+        "path": "/root/.vimrc",
+        "section": "global configuration",
+        "option": "mapleader"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/root/.vimrc"],
+    "required_modified_options": [
+      {
+        "path": "/root/.vimrc",
+        "section": "global configuration",
+        "option": "mapleader"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not replace Vim or bypass loading .vimrc"]
+  },
+  "observable_symptom": {
+    "command": "vim -Nu /root/.vimrc -n -es -c 'qa!'",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["E488"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Vim accepts the configuration and a space-prefixed mapping executes"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "A normal Vim ex-mode session remains operational"
+      }
+    ]
+  }
+}

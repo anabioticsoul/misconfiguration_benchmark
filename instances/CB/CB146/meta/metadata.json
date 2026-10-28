@@ -1,0 +1,8 @@
+{
+  "instance_id": "CB146",
+  "visibility": "private",
+  "private_oracle": {"classification": {"taxonomy_version": "1.0", "category_id": "CB-1", "root_cause_detail": "laravel_database_unix_socket_does_not_match_mysql_socket"}, "faulty_targets": [{"path": "/opt/laravel/config/database.php", "section": "mysql", "option": "unix_socket"}]},
+  "repair_policy": {"required_intervention": "config_change", "allowed_modified_files": ["/opt/laravel/config/database.php"], "required_modified_options": [{"path": "/opt/laravel/config/database.php", "section": "mysql", "option": "unix_socket"}], "forbidden_shortcuts": ["Do not bypass MySQL authentication or replace the database command with a configuration inspection"]},
+  "observable_symptom": {"command": "bash harness/repro.sh", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["Can't connect to local MySQL server through socket"]}},
+  "oracle": {"fail_to_pass": [{"path": "harness/f2p.sh", "description": "The configured Laravel socket reaches MySQL and the homestead database query succeeds after correction"}], "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The database and homestead account remain present and authentication remains required"}]}
+}

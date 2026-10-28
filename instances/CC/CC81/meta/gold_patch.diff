@@ -1,0 +1,5 @@
+diff --git a/etc/springboot/java.options b/etc/springboot/java.options
+--- a/etc/springboot/java.options
++++ b/etc/springboot/java.options
+@@ -0,0 +1 @@
++--add-opens=java.base/java.lang=ALL-UNNAMED

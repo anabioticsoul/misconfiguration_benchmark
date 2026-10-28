@@ -1,0 +1,51 @@
+{
+  "instance_id": "CD93",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "innodb_file_per_table_disabled_prevents_table_tablespaces_from_being_reclaimed_after_drop"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/mysql/conf.d/fault.cnf",
+        "section": "mysqld",
+        "option": "innodb_file_per_table"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/mysql/conf.d/fault.cnf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/mysql/conf.d/fault.cnf",
+        "section": "mysqld",
+        "option": "innodb_file_per_table"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not replace MySQL or delete its data directory; change the configuration option only."]
+  },
+  "observable_symptom": {
+    "command": "/harness/repro.sh",
+    "expected_pre_fix": {
+      "exit_code": "zero",
+      "stderr_contains": ["innodb_file_per_table is OFF"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "MySQL reports file-per-table enabled after the configuration repair, so newly created InnoDB tables use independent tablespaces."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "MySQL remains reachable and can create and drop an InnoDB table."
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <property name="LOG_DIR" value="/opt/cd92/logs" />
+    <appender name="LAST" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/last.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/last.%d{yyyy-MM}.gz</fileNamePattern>
+            <maxHistory>24</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date:%msg%n</pattern>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="LAST" />
+    </root>
+</configuration>

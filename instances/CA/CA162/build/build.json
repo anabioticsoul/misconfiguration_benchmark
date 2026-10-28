@@ -1,0 +1,8 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CA162",
+  "images": {"source": "apache/spark:3.5.1", "base": "ca162:base", "output": "ca162:latest"},
+  "context_dir": "build/context",
+  "scripts": {"base": "build/context/scripts/base.sh", "instance": "build/context/scripts/instance.sh"},
+  "archive": "image/CA162.tar.gz"
+}

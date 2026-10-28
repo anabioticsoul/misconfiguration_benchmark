@@ -1,0 +1,1 @@
+Build from the official nginx:1.25.5 image. Install PHP-FPM and curl using Debian's package manager, configure a local WordPress-like PHP endpoint behind Nginx, and introduce the missing SCRIPT_FILENAME parameter only in the fault layer. The resulting container must stay alive for harness-driven service startup.

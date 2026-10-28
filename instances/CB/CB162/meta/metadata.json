@@ -1,0 +1,57 @@
+{
+  "instance_id": "CB162",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CB-1",
+      "root_cause_detail": "postgresql_tls_protocol_version_mismatch"
+    },
+    "diagnosis_oracle": {
+      "component": "Postgrex SSL client"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/cb162/config/config.exs",
+        "section": ":cb162, :repo",
+        "option": "ssl_opts"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/cb162/config/config.exs"],
+    "required_modified_options": [
+      {
+        "path": "/opt/cb162/config/config.exs",
+        "section": ":cb162, :repo",
+        "option": "ssl_opts"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Disabling SSL or changing the PostgreSQL server TLS policy",
+      "Replacing the Postgrex connection with a non-SSL or synthetic client"
+    ]
+  },
+  "observable_symptom": {
+    "command": "cd /opt/cb162/app && mix run -e 'Cb162Probe.run()'",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Postgrex SSL connect failed"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "A Postgrex SSL connection to the local TLS 1.2-only PostgreSQL server succeeds"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "SSL remains enabled and the connection continues to use the configured PostgreSQL endpoint"
+      }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "instance_id": "CB113",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CB-1",
+      "root_cause_detail": "java_home_points_to_nonexistent_installation_path"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/profile.d/java_home.sh",
+        "section": "shell environment",
+        "option": "JAVA_HOME"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/profile.d/java_home.sh"],
+    "required_modified_options": [
+      {
+        "path": "/etc/profile.d/java_home.sh",
+        "section": "shell environment",
+        "option": "JAVA_HOME"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not modify the application or replace the Java executable; repair JAVA_HOME only."]
+  },
+  "observable_symptom": {
+    "command": "source /etc/profile.d/java_home.sh && /usr/local/bin/java-home-check",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["JAVA_HOME does not contain a usable Java installation"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "A Java application launched through JAVA_HOME succeeds after JAVA_HOME is corrected."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The system Java executable remains available and reports its version."
+      }
+    ]
+  }
+}

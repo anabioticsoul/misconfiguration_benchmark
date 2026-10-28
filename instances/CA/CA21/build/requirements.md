@@ -1,0 +1,1 @@
+Build from ubuntu:22.04. Install OpenJDK 11 and Maven, then compile the small Spring Framework JPA application. The base layer contains the working XML configuration; the instance layer removes the entity package scan and persistence unit name to reproduce Spring's no-persistence-units exception. No persistence.xml is used.

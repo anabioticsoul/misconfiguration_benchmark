@@ -1,0 +1,1 @@
+Install MySQL Server and client on Ubuntu 22.04. The clean base must accept TCP connections on its container address. The instance fault must constrain mysqld to loopback through an additional configuration file. Keep the final container alive for harness-driven service startup.

@@ -137,6 +137,8 @@ class InstanceBuildDefinition:
             )
             if len(token) > 2
         }
+        if "postgresql" in software_tokens:
+            software_tokens.add("postgres")
         if self.source_image.lower().startswith("misconfigbench/"):
             if software_tokens and not any(
                 token in repository.lower() for token in software_tokens
@@ -183,6 +185,7 @@ class DockerInstanceBuilder:
     def build(self) -> dict[str, object]:
         self._ensure_source_image()
         platform = self._source_platform()
+        source_user = self._source_user()
         rendered_dir = self.run_dir / "rendered"
         rendered_dir.mkdir(parents=True, exist_ok=True)
 
@@ -191,6 +194,7 @@ class DockerInstanceBuilder:
             rendered_dir / "Dockerfile.base",
             {
                 "source_image": self.definition.source_image,
+                "source_user": source_user,
                 "base_image": self.definition.base_image,
                 "output_image": self.definition.output_image,
                 "build_script": (
@@ -207,6 +211,7 @@ class DockerInstanceBuilder:
             rendered_dir / "Dockerfile.instance",
             {
                 "source_image": self.definition.source_image,
+                "source_user": source_user,
                 "base_image": self.definition.base_image,
                 "output_image": self.definition.output_image,
                 "build_script": (
@@ -250,12 +255,14 @@ class DockerInstanceBuilder:
         "builder",
         "validate_instance",
         ignore_inputs=["self"],
-        log_context=lambda self: (
+        log_context=lambda self, timeout_seconds=180: (
             f"{self.definition.case.instance_id} using "
             f"{self.definition.output_image}"
         ),
     )
-    def validate(self) -> dict[str, object]:
+    def validate(self, timeout_seconds: int = 180) -> dict[str, object]:
+        if timeout_seconds <= 0:
+            raise ValueError("Validation timeout must be positive")
         reproduce = self.definition.case.case_dir / self.definition.case.reproduce_script
         f2p_scripts = [
             self.definition.case.case_dir / relative
@@ -316,6 +323,7 @@ class DockerInstanceBuilder:
                     "/tmp/misconfigbench-reproduce.sh",
                 ],
                 check=False,
+                timeout_seconds=timeout_seconds,
             )
             pre_fix_f2p = [
                 self._run(
@@ -327,7 +335,7 @@ class DockerInstanceBuilder:
                         f"/tmp/misconfigbench-f2p-{index}.sh",
                     ],
                     check=False,
-                    timeout_seconds=180,
+                    timeout_seconds=timeout_seconds,
                 )
                 for index in range(len(f2p_scripts))
             ]
@@ -341,7 +349,7 @@ class DockerInstanceBuilder:
                         f"/tmp/misconfigbench-p2p-{index}.sh",
                     ],
                     check=False,
-                    timeout_seconds=180,
+                    timeout_seconds=timeout_seconds,
                 )
                 for index in range(len(p2p_scripts))
             ]
@@ -355,7 +363,7 @@ class DockerInstanceBuilder:
                 self.definition.output_image,
             ],
             check=False,
-            timeout_seconds=180,
+            timeout_seconds=timeout_seconds,
         )
         reproduction_infrastructure_error = (
             "command not found" in reproduction.stderr.lower()
@@ -477,6 +485,19 @@ class DockerInstanceBuilder:
                 f"Could not determine platform for {self.definition.source_image}"
             )
         return platform
+
+    def _source_user(self) -> str:
+        completed = self._run(
+            [
+                "docker",
+                "image",
+                "inspect",
+                "--format",
+                "{{.Config.User}}",
+                self.definition.source_image,
+            ]
+        )
+        return completed.stdout.strip()
 
     def _docker_build(
         self,

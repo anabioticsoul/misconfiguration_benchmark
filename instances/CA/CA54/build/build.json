@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CA54",
+  "images": {
+    "source": "apache/hadoop:3.3.6",
+    "base": "ca54:base",
+    "output": "ca54:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh"
+  },
+  "archive": "image/CA54.tar.gz"
+}

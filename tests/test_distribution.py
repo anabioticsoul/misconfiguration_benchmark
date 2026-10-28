@@ -18,8 +18,9 @@ from agents.manager.distribution import (
     push_registry_image,
     record_image_distribution,
 )
-from agents.manager.settings import load_repository_env
+from agents.manager.settings import _inherit_macos_system_proxy, load_repository_env
 from agents.manager.validation import load_case_documents
+from agents.manager.paths import instance_dir
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -50,6 +51,47 @@ class DistributionTest(unittest.TestCase):
                     os.environ["MISCONFIGBENCH_HF_REPO"],
                     "example/bench",
                 )
+
+    def test_macos_system_proxy_is_inherited_when_not_explicitly_set(self) -> None:
+        proxy_output = """<dictionary> {
+  HTTPEnable : 1
+  HTTPPort : 7890
+  HTTPProxy : 127.0.0.1
+  HTTPSEnable : 1
+  HTTPSPort : 7890
+  HTTPSProxy : 127.0.0.1
+}"""
+        completed = SimpleNamespace(returncode=0, stdout=proxy_output)
+        with (
+            patch.dict(os.environ, {}, clear=True),
+            patch("agents.manager.settings.platform.system", return_value="Darwin"),
+            patch(
+                "agents.manager.settings.subprocess.run",
+                return_value=completed,
+            ),
+        ):
+            _inherit_macos_system_proxy()
+
+            self.assertEqual(os.environ["HTTP_PROXY"], "http://127.0.0.1:7890")
+            self.assertEqual(os.environ["HTTPS_PROXY"], "http://127.0.0.1:7890")
+
+    def test_explicit_proxy_is_not_replaced_by_macos_proxy(self) -> None:
+        with (
+            patch.dict(
+                os.environ,
+                {
+                    "HTTP_PROXY": "http://configured-proxy:8080",
+                    "HTTPS_PROXY": "http://configured-proxy:8080",
+                },
+                clear=True,
+            ),
+            patch("agents.manager.settings.platform.system", return_value="Darwin"),
+        ):
+            _inherit_macos_system_proxy()
+
+            self.assertEqual(
+                os.environ["HTTPS_PROXY"], "http://configured-proxy:8080"
+            )
 
     def test_registry_login_passes_token_through_stdin(self) -> None:
         completed = SimpleNamespace(returncode=0, stdout="", stderr="")
@@ -99,7 +141,7 @@ class DistributionTest(unittest.TestCase):
     def test_recorded_distribution_follows_contract(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_dir:
             case_dir = Path(temporary_dir) / "CA35"
-            source = REPO_ROOT / "instances/CA35"
+            source = instance_dir(REPO_ROOT, "CA35")
             import shutil
 
             shutil.copytree(source, case_dir)

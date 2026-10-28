@@ -14,6 +14,24 @@ The description below is the only case-specific source of truth:
 
 Do not reuse assumptions or private oracle details from another instance.
 
+Treat the complete source, including an `Accepted Answer` section, as a
+fidelity constraint. Do not invent a different symptom, root cause, software
+version, or repair merely to make an instance fit this benchmark. In
+particular, if the source says that the configuration already works, that no
+configuration repair is required, or that the symptom is an upstream product
+defect, the source is not an actionable `misconfig_troubleshooting` task. Do
+not create a synthetic faulty Docker environment for it; report that it needs
+human review or a rewritten source description instead.
+
+For an ineligible source, do not write any instance files. Your final response
+must contain exactly one standalone line in this form:
+
+```text
+MISCONFIGBENCH_INELIGIBLE: <concise source-fidelity reason>
+```
+
+The host records this as a completed exclusion, not a failed generation.
+
 ## Taxonomy
 
 The first two characters of the instance ID encode its top-level taxonomy type:
@@ -189,6 +207,9 @@ themselves to observe the failure and repaired behavior.
       "category_id": "<taxonomy subtype ID>",
       "root_cause_detail": "<machine-readable detail>"
     },
+    "diagnosis_oracle": {
+      "component": "<canonical affected component name>"
+    },
     "faulty_targets": [
       {
         "path": "<absolute container path>",
@@ -233,6 +254,10 @@ themselves to observe the failure and repaired behavior.
 }
 ```
 
+`diagnosis_oracle.component` is a concise canonical name for the affected
+runtime component that a diagnosis agent can identify from public evidence. It
+is private ground truth for component-level localization, not a repair hint.
+
 ## Behavioral Contract
 
 - The base image is clean and exhibits the intended correct behavior.
@@ -249,6 +274,9 @@ themselves to observe the failure and repaired behavior.
   the repair and must remain afterward. Do not require an undeclared option,
   the repaired value, or an incidental implementation detail.
 - `gold_patch.diff` changes only allowed configuration files.
+  Preserve exact whitespace from the faulty file and correct unified-diff hunk
+  counts. Prefer generating the patch with `git diff` over writing it by hand;
+  `git apply --numstat` checks syntax but does not prove it applies to the image.
 - `eval_patch.sh` dynamically extracts those files from a fresh faulty
   container, checks patch scope, applies the patch, starts another fresh
   container, waits for readiness, and runs F2P plus P2P.
@@ -264,6 +292,34 @@ themselves to observe the failure and repaired behavior.
   commands, POSIX utilities, and shell parameter expansion.
 - Harnesses, gold patches, and private metadata must never be copied into the
   image.
+- Prefer the target's real server or an established local component over a
+  handwritten implementation of application protocols such as FastCGI, MySQL,
+  PostgreSQL, or HTTP. A test fixture may be small, but its protocol behavior
+  must not become the failure being measured.
+- F2P must exercise the same fault-sensitive operation as reproduction. A
+  liveness check or an ordinary request is insufficient when the defect occurs
+  only under buffering, load, a specific client mode, or another condition.
+- When a harness starts a service, capture startup output in a case-local log
+  and print that log before failing. Do not discard service lifecycle errors to
+  `/dev/null`.
+  If the image entrypoint already starts the service, do not start a second
+  process against the same data directory. Wait for an unaffected readiness
+  condition before asserting the intended failure.
+- In `eval_patch.sh`, use `git diff --name-only` after applying the patch; a
+  commit message such as `baseline` is not a revision name. Resolve harness
+  paths from the evaluator's own directory, never from a relative host path.
+  Set Git user identity on every evaluator commit, not just the first one.
+  Invoke the actual F2P and P2P scripts after repair; version checks are not a
+  substitute for those scripts.
+- When streaming a harness with `docker exec ... bash -s < script.sh`, always
+  pass `docker exec -i`; otherwise the shell can exit successfully without
+  executing any tests. Evaluator containers must explicitly use the instance's
+  entrypoint/command instead of assuming the image's default shell stays alive.
+- Create service log files as the service user, not as root before dropping
+  privileges. Verify that the service can write its startup log.
+- For locale-dependent faults on minimal Debian/Ubuntu images, check dpkg's
+  catalog exclusions before installing translations and assert that the actual
+  required `.mo` catalog exists. Installing the package alone is not sufficient.
 
 Use `#!/usr/bin/env bash` for every script that uses `set -euo pipefail`; do not
 combine `#!/bin/sh` with `pipefail`. Avoid sleeps as the primary readiness
@@ -271,6 +327,15 @@ mechanism. Pin software versions where practical. Keep credentials synthetic
 and isolated. Check that every non-POSIX diagnostic command used by a harness
 exists in the selected image; a missing command must fail the harness rather
 than accidentally satisfy a negated condition.
+
+Run `bash -n` on every generated shell script before finishing. With
+`set -o pipefail`, do not use a producer pipeline whose consumer intentionally
+stops early, such as `php -i | awk '...; exit'` or `command | grep -q pattern`.
+The producer can receive SIGPIPE and make an otherwise correct harness fail
+with exit 141 or 255. Query the program directly, capture its output first, or
+use a consumer that reads the entire stream. Service harnesses must wait for
+the expected ready response: a TCP connection, 404, or 502 alone is not proof
+that the target service has finished starting.
 
 The final container must remain running and provide an investigation shell even
 when the target service itself fails to start. `runtime.ready_check` describes

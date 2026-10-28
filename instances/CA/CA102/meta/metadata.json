@@ -1,0 +1,54 @@
+{
+  "instance_id": "CA102",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-4",
+      "root_cause_detail": "conflicting_ipv6_listen_options"
+    },
+    "diagnosis_oracle": {
+      "component": "nginx HTTP listen configuration"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/nginx/conf.d/default.conf",
+        "section": "server.listen",
+        "option": "ipv6only"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/nginx/conf.d/default.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/nginx/conf.d/default.conf",
+        "section": "server.listen",
+        "option": "ipv6only"
+      }
+    ],
+    "forbidden_shortcuts": ["Removing the IPv6 virtual host or changing the requested listen topology"]
+  },
+  "observable_symptom": {
+    "command": "nginx -t",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["duplicate listen options for [::]:80"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Nginx configuration test succeeds after the conflicting ipv6only value is corrected"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "All three requested server names and both address-family listen directives remain present"
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "instance_id": "CD107",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "hibernate_dialect_required_when_jdbc_dialect_resolution_is_unavailable"
+    },
+    "faulty_targets": [{
+      "path": "/opt/cd107/application.properties",
+      "section": "global Hibernate properties",
+      "option": "hibernate.dialect"
+    }]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/cd107/application.properties"],
+    "required_modified_options": [{
+      "path": "/opt/cd107/application.properties",
+      "section": "global Hibernate properties",
+      "option": "hibernate.dialect"
+    }],
+    "forbidden_shortcuts": ["Do not replace or modify the Hibernate application", "Do not suppress the failing command"]
+  },
+  "observable_symptom": {
+    "command": "java -cp \"target/classes:$(cat classpath)\" bench.App",
+    "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["Access to DialectResolutionInfo cannot be null when 'hibernate.dialect' not set"]}
+  },
+  "oracle": {
+    "fail_to_pass": [{"path": "harness/f2p.sh", "description": "Hibernate SessionFactory initialization succeeds after specifying its dialect"}],
+    "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The fixture remains the same compiled Hibernate program and configuration file"}]
+  }
+}

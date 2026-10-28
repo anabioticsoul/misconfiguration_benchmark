@@ -1,8 +1,13 @@
 FROM {{ base_image }}
 
+USER root
+
 COPY fault-overlay/ /
 {% if build_script %}
 COPY {{ build_script }} /tmp/misconfigbench-build-layer.sh
 RUN bash /tmp/misconfigbench-build-layer.sh \
     && rm -f /tmp/misconfigbench-build-layer.sh
+{% endif %}
+{% if source_user %}
+USER {{ source_user }}
 {% endif %}

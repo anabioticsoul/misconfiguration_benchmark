@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
 git_repo() {
   git -C "$REPO_ROOT" "$@"
@@ -11,7 +11,7 @@ git_repo() {
 require_git_repository() {
   local root
   root="$(git_repo rev-parse --show-toplevel)"
-  if [ "$(cd "$root" && pwd)" != "$REPO_ROOT" ]; then
+  if [ "$(cd "$root" && pwd -P)" != "$REPO_ROOT" ]; then
     echo "Error: expected Git repository at $REPO_ROOT" >&2
     return 1
   fi
@@ -104,6 +104,7 @@ fi
 echo "Repository: $REPO_ROOT"
 echo "Destination: $remote ($remote_url)"
 echo "Branch: $branch"
+bash "$REPO_ROOT/scripts/commit_local.sh" --check-index
 if [ "$dry_run" = "true" ]; then
   echo "Dry run complete; no commits were pushed."
   exit 0

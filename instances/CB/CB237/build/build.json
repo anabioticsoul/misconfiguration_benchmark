@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CB237",
+  "images": {
+    "source": "postgres:14-bookworm",
+    "base": "cb237:base",
+    "output": "cb237:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh",
+    "instance": "build/context/scripts/instance.sh"
+  },
+  "archive": "image/CB237.tar.gz"
+}

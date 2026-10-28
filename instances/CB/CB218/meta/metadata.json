@@ -1,0 +1,8 @@
+{
+  "instance_id": "CB218",
+  "visibility": "private",
+  "private_oracle": {"classification": {"taxonomy_version": "1.0", "category_id": "CB-1", "root_cause_detail": "spring.cache.type=GENERIC disables memcached starter auto-configuration while no generic Cache bean exists"}, "faulty_targets": [{"path": "/opt/ted-search/application.properties", "section": "Spring cache", "option": "spring.cache.type"}]},
+  "repair_policy": {"required_intervention": "config_change", "allowed_modified_files": ["/opt/ted-search/application.properties"], "required_modified_options": [{"path": "/opt/ted-search/application.properties", "section": "Spring cache", "option": "spring.cache.type"}], "forbidden_shortcuts": ["Do not remove memcached settings", "Do not replace the application command or suppress the startup failure"]},
+  "observable_symptom": {"command": "cd /opt/ted-search && java -cp /opt/ted-search App", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["No cache manager could be auto-configured", "caching type is 'GENERIC'"]}},
+  "oracle": {"fail_to_pass": [{"path": "harness/f2p.sh", "description": "Application changes from cache startup failure to successful startup after spring.cache.type is removed."}], "pass_to_pass": [{"path": "harness/p2p.sh", "description": "Memcached server configuration remains present and successful startup identifies MemcachedCacheManager."}]}
+}

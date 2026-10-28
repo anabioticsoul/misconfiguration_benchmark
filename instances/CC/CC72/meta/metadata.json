@@ -1,0 +1,51 @@
+{
+  "instance_id": "CC72",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CC-1",
+      "root_cause_detail": "project_php_constraint_selects_php7_semantics_so_rector_does_not_target_php8_attributes"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/rector-demo/composer.json",
+        "section": "require",
+        "option": "php"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/rector-demo/composer.json"],
+    "required_modified_options": [
+      {
+        "path": "/opt/rector-demo/composer.json",
+        "section": "require",
+        "option": "php"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not edit the Rector configuration or entity source; do not replace Rector with a synthetic script."]
+  },
+  "observable_symptom": {
+    "command": "cd /opt/rector-demo && vendor/bin/rector process src/Entity --dry-run --debug",
+    "expected_pre_fix": {
+      "exit_code": "zero",
+      "stderr_contains": []
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Rector changes from reporting no changes to detecting Doctrine annotations that can become attributes after the PHP requirement is raised."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The real Rector executable remains installed and the entity fixture remains present before and after repair."
+      }
+    ]
+  }
+}

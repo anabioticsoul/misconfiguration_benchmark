@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CA19",
+  "images": {
+    "source": "ubuntu:22.04",
+    "base": "ca19:base",
+    "output": "ca19:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh"
+  },
+  "archive": "image/CA19.tar.gz"
+}

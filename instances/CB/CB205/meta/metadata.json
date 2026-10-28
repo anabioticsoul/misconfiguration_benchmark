@@ -1,0 +1,54 @@
+{
+  "instance_id": "CB205",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CB-2",
+      "root_cause_detail": "apache_listen_port_competes_with_nginx_listen_port_in_shared_network_namespace"
+    },
+    "diagnosis_oracle": {
+      "component": "Apache HTTP Server"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/apache2/ports.conf",
+        "section": "global listener declarations",
+        "option": "Listen"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/apache2/ports.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/apache2/ports.conf",
+        "section": "global listener declarations",
+        "option": "Listen"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not stop or remove nginx", "Do not change the service startup commands", "Do not merely alter containerPort metadata"]
+  },
+  "observable_symptom": {
+    "command": "nginx && apache2ctl -DFOREGROUND",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["Address already in use"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Apache and nginx can run concurrently after Apache's listener is moved off port 80"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "Nginx continues to start and serve its existing HTTP response"
+      }
+    ]
+  }
+}

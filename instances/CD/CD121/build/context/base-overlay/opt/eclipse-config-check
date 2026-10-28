@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+launch_dir=${1:?launch directory required}
+prefs="$(dirname "$(dirname "$launch_dir")")/org.eclipse.debug.ui/org.eclipse.debug.ui.prefs"
+if [ ! -f "$prefs" ]; then
+  echo "Eclipse debug preferences are missing" >&2
+  exit 2
+fi
+value=$(awk -F= '$1 == "filterDeletedProjects" {print $2}' "$prefs")
+if [ "$value" = "true" ]; then
+  echo "A configuration with this name already exists" >&2
+  echo "Existing configuration is hidden by Filter Deleted/Unavailable Projects" >&2
+  exit 1
+fi
+printf '%s\n' "Equivalence Checker configuration is discoverable"

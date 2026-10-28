@@ -1,0 +1,8 @@
+diff --git a/etc/mysql/mysql.conf.d/zz-ca151.cnf b/etc/mysql/mysql.conf.d/zz-ca151.cnf
+index 1a2b3c4..5d6e7f8 100644
+--- a/etc/mysql/mysql.conf.d/zz-ca151.cnf
++++ b/etc/mysql/mysql.conf.d/zz-ca151.cnf
+@@ -1,2 +1,2 @@
+ [mysqld]
+-bind-address = 127.0.0.1
++bind-address = 0.0.0.0

@@ -1,0 +1,1 @@
+Build from ubuntu:22.04 with OpenJDK 17 and Maven. The base layer contains a minimal real Spring/Camel XML application with the correct camel-spring-xml dependency; the instance overlay removes that dependency to reproduce the NamespaceHandler failure. Maven dependencies and the exec plugin are cached during the base build so harnesses run offline.

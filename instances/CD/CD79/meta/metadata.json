@@ -1,0 +1,8 @@
+{
+  "instance_id": "CD79",
+  "visibility": "private",
+  "private_oracle": {"classification": {"taxonomy_version": "1.0", "category_id": "CD-2", "root_cause_detail": "Apache directory authorization value denies access despite a valid custom document root"}, "faulty_targets": [{"path": "/etc/apache2/sites-available/000-default.conf", "section": "Directory /srv/custom-root", "option": "Require"}]},
+  "repair_policy": {"required_intervention": "config_change", "allowed_modified_files": ["/etc/apache2/sites-available/000-default.conf"], "required_modified_options": [{"path": "/etc/apache2/sites-available/000-default.conf", "section": "Directory /srv/custom-root", "option": "Require"}], "forbidden_shortcuts": ["Do not change filesystem permissions, remove Apache authorization, or replace Apache with another server"]},
+  "observable_symptom": {"command": "curl -fsS http://127.0.0.1/", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["403"]}},
+  "oracle": {"fail_to_pass": [{"path": "harness/f2p.sh", "description": "The custom document root changes from HTTP 403 to the expected page"}], "pass_to_pass": [{"path": "harness/p2p.sh", "description": "Apache remains running and serves the expected custom-root identity after repair"}]}
+}

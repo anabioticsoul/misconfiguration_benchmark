@@ -7,9 +7,15 @@ import unittest
 from pathlib import Path
 
 from agents.builder.prompts import render_builder_prompt
+from agents.builder.run_case import (
+    _record_ineligible_result,
+    _preflight_generated_workspace,
+    _sync_description_from_assets,
+)
 from agents.manager.build import InstanceBuildDefinition
 from agents.manager import TAXONOMY_PATH
 from agents.manager.case import CaseDefinition
+from agents.manager.paths import instance_dir
 from agents.manager.workspace import WorkspaceFiles
 
 
@@ -17,8 +23,24 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 class BuilderTest(unittest.TestCase):
+    def test_streamed_harness_requires_interactive_stdin(self) -> None:
+        for flags, accepted in (("", False), ("-t", False), ("-i", True),
+                                ("-it", True), ("--interactive", True)):
+            with self.subTest(flags=flags), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                (root / "harness").mkdir()
+                (root / "harness/eval_patch.sh").write_text(
+                    '#!/usr/bin/env bash\nset -euo pipefail\n'
+                    f'docker exec {flags} "$container" bash -s < "$script_dir/f2p.sh"\n'
+                )
+                if accepted:
+                    _preflight_generated_workspace(root)
+                else:
+                    with self.assertRaisesRegex(ValueError, "requires -i"):
+                        _preflight_generated_workspace(root)
+
     def setUp(self) -> None:
-        self.case = CaseDefinition.load(REPO_ROOT / "instances" / "CA35")
+        self.case = CaseDefinition.load(instance_dir(REPO_ROOT, "CA35"))
 
     def test_ca35_builder_uses_separate_base_and_instance_images(self) -> None:
         definition = InstanceBuildDefinition.load(self.case)
@@ -41,6 +63,61 @@ class BuilderTest(unittest.TestCase):
             "COPY fault-overlay/",
             definition.instance_dockerfile_template.read_text(),
         )
+        self.assertIn(
+            "USER root",
+            definition.base_dockerfile_template.read_text(),
+        )
+        self.assertIn(
+            "{% if source_user %}",
+            definition.instance_dockerfile_template.read_text(),
+        )
+
+    def test_builder_syncs_asset_description_and_creates_case_directory(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            root = Path(temporary_dir)
+            assets_root = root / "assets"
+            source = assets_root / "CB" / "CB999.md"
+            source.parent.mkdir(parents=True)
+            source.write_text("# CB999\n\nSource description.\n", encoding="utf-8")
+            case_dir = instance_dir(root, "CB999")
+
+            description_path = _sync_description_from_assets(
+                "CB999",
+                case_dir,
+                assets_root,
+            )
+
+            self.assertEqual(
+                description_path,
+                case_dir / "meta" / "description.md",
+            )
+            self.assertEqual(
+                description_path.read_text(encoding="utf-8"),
+                "# CB999\n\nSource description.\n",
+            )
+
+    def test_builder_does_not_overwrite_existing_description(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            root = Path(temporary_dir)
+            case_dir = instance_dir(root, "CA999")
+            description_path = case_dir / "meta" / "description.md"
+            description_path.parent.mkdir(parents=True)
+            description_path.write_text("Existing description.\n", encoding="utf-8")
+            source = root / "assets" / "CA" / "CA999.md"
+            source.parent.mkdir(parents=True)
+            source.write_text("Asset description.\n", encoding="utf-8")
+
+            synced_path = _sync_description_from_assets(
+                "CA999",
+                case_dir,
+                root / "assets",
+            )
+
+            self.assertEqual(synced_path, description_path)
+            self.assertEqual(
+                synced_path.read_text(encoding="utf-8"),
+                "Existing description.\n",
+            )
 
     def test_ca35_build_context_injects_only_the_password_fault(self) -> None:
         definition = InstanceBuildDefinition.load(self.case)
@@ -79,8 +156,44 @@ class BuilderTest(unittest.TestCase):
         self.assertIn("real failing software command", prompt)
         self.assertIn("Every F2P script must fail", prompt)
 
+    def test_builder_records_explicit_ineligible_response_without_failure(self) -> None:
+        result: dict[str, object] = {"success": False}
+
+        handled = _record_ineligible_result(
+            result,
+            "MISCONFIGBENCH_INELIGIBLE: The accepted answer requires runtime cleanup.",
+        )
+
+        self.assertTrue(handled)
+        self.assertTrue(result["success"])
+        self.assertEqual(result["outcome"], "ineligible")
+        self.assertEqual(
+            result["ineligible_reason"],
+            "The accepted answer requires runtime cleanup.",
+        )
+
+    def test_builder_ignores_ordinary_agent_response(self) -> None:
+        self.assertFalse(
+            _record_ineligible_result({}, "Implemented a valid instance.")
+        )
+
+    def test_builder_prompt_prohibits_inventing_repairs_for_non_actionable_sources(
+        self,
+    ) -> None:
+        prompt = render_builder_prompt(
+            REPO_ROOT,
+            "CB110",
+            "# Source\n\n## Accepted Answer\nThe configuration already works.",
+            TAXONOMY_PATH.read_text(),
+            "- nginx:1.25.5",
+        )
+
+        self.assertIn("Accepted Answer", prompt)
+        self.assertIn("Do not invent a different symptom", prompt)
+        self.assertIn("not an actionable `misconfig_troubleshooting` task", prompt)
+
     def test_ca14_generated_contract_loads(self) -> None:
-        case = CaseDefinition.load(REPO_ROOT / "instances" / "CA14")
+        case = CaseDefinition.load(instance_dir(REPO_ROOT, "CA14"))
         definition = InstanceBuildDefinition.load(case)
 
         self.assertEqual(case.instance_id, "CA14")
@@ -89,6 +202,66 @@ class BuilderTest(unittest.TestCase):
         self.assertTrue(
             (definition.context_dir / "fault-overlay/etc/mysql/my.cnf").is_file()
         )
+
+    def test_shell_preflight_rejects_sigpipe_prone_pipefail_pipeline(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            case_dir = Path(temporary_dir)
+            harness = case_dir / "harness"
+            harness.mkdir()
+            (harness / "repro.sh").write_text(
+                "#!/usr/bin/env bash\n"
+                "set -euo pipefail\n"
+                "php -i | awk '/html_errors/{print; exit}'\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "early-exiting"):
+                _preflight_generated_workspace(case_dir)
+
+    def test_shell_preflight_accepts_direct_runtime_query(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            case_dir = Path(temporary_dir)
+            harness = case_dir / "harness"
+            harness.mkdir()
+            (harness / "repro.sh").write_text(
+                "#!/usr/bin/env bash\n"
+                "set -euo pipefail\n"
+                "php -r 'echo ini_get(\"html_errors\");'\n",
+                encoding="utf-8",
+            )
+
+            _preflight_generated_workspace(case_dir)
+
+    def test_shell_preflight_rejects_baseline_commit_message_as_revision(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            case_dir = Path(temporary_dir)
+            harness = case_dir / "harness"
+            harness.mkdir()
+            (harness / "eval_patch.sh").write_text(
+                "#!/usr/bin/env bash\n"
+                "set -euo pipefail\n"
+                "git commit -qm baseline\n"
+                "git diff --name-only baseline\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "not a Git revision"):
+                _preflight_generated_workspace(case_dir)
+
+    def test_shell_preflight_rejects_relative_evaluator_harness_path(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            case_dir = Path(temporary_dir)
+            harness = case_dir / "harness"
+            harness.mkdir()
+            (harness / "eval_patch.sh").write_text(
+                "#!/usr/bin/env bash\n"
+                "set -euo pipefail\n"
+                "docker exec test bash -s < harness/f2p.sh\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "relative host path"):
+                _preflight_generated_workspace(case_dir)
 
     def test_workspace_rejects_path_escape(self) -> None:
         with tempfile.TemporaryDirectory() as temporary_dir:

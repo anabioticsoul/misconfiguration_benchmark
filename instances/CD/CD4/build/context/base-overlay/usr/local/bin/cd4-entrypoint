@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+log=/tmp/cd4-mysqld.log
+rm -f /run/cd4-ready /run/mysqld/mysqld.sock /run/mysqld/mysqld.pid "$log"
+mkdir -p /run/mysqld
+chown mysql:mysql /run/mysqld
+
+if [ ! -d /var/lib/mysql/mysql ]; then
+  rm -rf /var/lib/mysql/*
+  mysqld --initialize-insecure --user=mysql --datadir=/var/lib/mysql >"$log" 2>&1
+fi
+
+mysqld_args=(--user=mysql --datadir=/var/lib/mysql --socket=/run/mysqld/mysqld.sock --pid-file=/run/mysqld/mysqld.pid)
+if [ -f /etc/mysql/conf.d/cd4-fault.cnf ]; then
+  mysqld_args=(--defaults-extra-file=/etc/mysql/conf.d/cd4-fault.cnf "${mysqld_args[@]}")
+fi
+mysqld "${mysqld_args[@]}" >"$log" 2>&1 &
+server_pid=$!
+cleanup() {
+  kill "$server_pid" 2>/dev/null || true
+  wait "$server_pid" 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
+
+ready=0
+for _ in $(seq 1 120); do
+  if mysqladmin --protocol=socket --socket=/run/mysqld/mysqld.sock -uroot ping >/dev/null 2>&1; then
+    ready=1
+    break
+  fi
+  if ! kill -0 "$server_pid" 2>/dev/null; then
+    cat "$log" >&2
+    exit 1
+  fi
+  sleep 0.5
+done
+if [ "$ready" -ne 1 ]; then
+  cat "$log" >&2
+  exit 1
+fi
+
+mysql --protocol=socket --socket=/run/mysqld/mysqld.sock -uroot <<'SQL'
+CREATE DATABASE IF NOT EXISTS cd4db;
+USE cd4db;
+CREATE TABLE IF NOT EXISTS payload (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, data LONGTEXT NOT NULL);
+SQL
+
+touch /run/cd4-ready
+wait "$server_pid"

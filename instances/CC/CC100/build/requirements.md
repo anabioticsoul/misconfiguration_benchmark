@@ -1,0 +1,1 @@
+Build a reproducible Spring Boot 1.5.22 MVC application on Ubuntu 22.04 with Java 11 and Maven. The base layer must contain the working application and Thymeleaf dependency. The instance layer must replace only the Maven dependency manifest to omit the template engine, while retaining the controller and template. Keep the final container alive for harness-driven service startup.

@@ -1,0 +1,1 @@
+Build from the clean ubuntu:22.04 image. The base layer installs Apache HTTP Server and OpenSSL, creates a deterministic synthetic certificate hierarchy, enables mod_ssl, and configures the HTTPS virtual host correctly. The fault overlay replaces only the virtual-host configuration with the source-described certificate directive error.

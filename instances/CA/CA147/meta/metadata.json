@@ -1,0 +1,55 @@
+{
+  "instance_id": "CA147",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-3",
+      "root_cause_detail": "php_cli_forces_html_errors_off_after_ini_parsing"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/php/8.1/cli/php.ini",
+        "section": "PHP",
+        "option": "html_errors"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/php/8.1/cli/php.ini"],
+    "required_modified_options": [
+      {
+        "path": "/etc/php/8.1/cli/php.ini",
+        "section": "PHP",
+        "option": "html_errors"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not replace or wrap the php executable",
+      "Do not use command-line -d overrides or environment variables",
+      "Do not modify files outside /etc/php/8.1/cli/php.ini"
+    ]
+  },
+  "observable_symptom": {
+    "command": "configured=$(awk -F= '/^[[:space:]]*html_errors[[:space:]]*=/{gsub(/[[:space:]]/,\"\",$2); print tolower($2); exit}' /etc/php/8.1/cli/php.ini); effective=$(php -i | awk -F'=> ' '/^html_errors =>/{gsub(/[[:space:]]/,\"\",$2); print tolower($2); exit}'); test \"$configured\" = \"$effective\"",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": []
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The configured html_errors value agrees with PHP CLI's effective value"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "PHP CLI remains installed, loads the declared configuration file, and executes code"
+      }
+    ]
+  }
+}

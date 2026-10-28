@@ -1,0 +1,20 @@
+{
+  "instance_id": "CC70",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {"taxonomy_version": "1.0", "category_id": "CC-1", "root_cause_detail": "spring_security_dependency_enables_default_http_basic_authentication"},
+    "diagnosis_oracle": {"component": "Spring Security"},
+    "faulty_targets": [{"path": "/opt/app/pom.xml", "section": "dependencies", "option": "spring-boot-starter-security"}]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/app/pom.xml"],
+    "required_modified_options": [{"path": "/opt/app/pom.xml", "section": "dependencies", "option": "spring-boot-starter-security"}],
+    "forbidden_shortcuts": ["Do not alter application source, bypass authentication in the harness, or replace the server"]
+  },
+  "observable_symptom": {"command": "status=$(curl -sS -o /tmp/body -w '%{http_code}' http://127.0.0.1:8080/vs1/users); [ \"$status\" = 401 ] && echo 'HTTP status 401' >&2 && exit 1", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["HTTP status 401"]}},
+  "oracle": {
+    "fail_to_pass": [{"path": "harness/f2p.sh", "description": "GET /vs1/users becomes publicly accessible with HTTP 200 after removing the security dependency"}],
+    "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The Spring Boot endpoint remains reachable and returns a JSON array"}]
+  }
+}

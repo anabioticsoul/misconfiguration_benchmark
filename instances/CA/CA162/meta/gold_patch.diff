@@ -1,0 +1,8 @@
+diff --git a/orc_config.conf b/orc_config.conf
+index 22a3c74..b7d4ec1 100644
+--- a/orc_config.conf
++++ b/orc_config.conf
+@@ -1,2 +1,2 @@
+ [orc]
+-orc.compress=zlib
++compression=snappy

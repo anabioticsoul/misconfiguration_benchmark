@@ -1,0 +1,1 @@
+Build from ubuntu:22.04 and install the distribution PHP 8.1 CLI package. The faulty layer must provide a CLI php.ini with html_errors = On while retaining the PHP CLI SAPI behavior that reports the effective value as Off. The image must remain available for shell investigation.

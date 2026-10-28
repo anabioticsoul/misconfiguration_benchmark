@@ -1,0 +1,54 @@
+{
+  "instance_id": "CC94",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CC-1",
+      "root_cause_detail": "spring_boot_gradle_plugin_requires_java_17_but_build_uses_java_8"
+    },
+    "diagnosis_oracle": {
+      "component": "Gradle Java runtime"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/cc94/app/system.properties",
+        "section": "Java runtime selection",
+        "option": "java.runtime.version"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/cc94/app/system.properties"],
+    "required_modified_options": [
+      {
+        "path": "/opt/cc94/app/system.properties",
+        "section": "Java runtime selection",
+        "option": "java.runtime.version"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not downgrade the Spring Boot plugin or remove the plugin from build.gradle", "Do not bypass Gradle or replace the build with a synthetic success"]
+  },
+  "observable_symptom": {
+    "command": "cd /opt/cc94/app && ./gradlew build -x check --offline",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["component compatible with Java 17", "consumer needed a runtime of a component compatible with Java 8"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The real Gradle build succeeds after selecting Java 17"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The project continues to use Spring Boot Gradle plugin 3.1.0 and Gradle 7.6.1"
+      }
+    ]
+  }
+}

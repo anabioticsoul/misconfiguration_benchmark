@@ -1,0 +1,11 @@
+diff --git a/etc/flink/flink-conf.yaml b/etc/flink/flink-conf.yaml
+--- a/etc/flink/flink-conf.yaml
++++ b/etc/flink/flink-conf.yaml
+@@ -5,5 +5,5 @@
+ state.savepoints.dir: s3p://gamma-flink-test-checkpoint/savepoints/
+ state.backend.fs.savepointdir: s3p://gamma-flink-test-checkpoint/savepoints/
+-s3.connection.timeout: 600000
+-s3.socket.timeout: 600000
++s3.connect-timeout: 600000
++s3.socket-timeout: 600000
+ s3.connection.establish.timeout: 600000

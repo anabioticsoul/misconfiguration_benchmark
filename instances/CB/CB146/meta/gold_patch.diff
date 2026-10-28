@@ -1,0 +1,13 @@
+diff --git a/opt/laravel/config/database.php b/opt/laravel/config/database.php
+index 4d8c3a1..f1b0c21 100644
+--- a/opt/laravel/config/database.php
++++ b/opt/laravel/config/database.php
+@@ -5,7 +5,7 @@ return [
+     'database' => 'homestead',
+     'username' => 'homestead',
+     'password' => 'secret',
+-    'unix_socket' => '/tmp/mysql.sock',
++    'unix_socket' => '/var/run/mysqld/mysqld.sock',
+     'charset' => 'utf8',
+     'collation' => 'utf8_unicode_ci',
+     'prefix' => '',

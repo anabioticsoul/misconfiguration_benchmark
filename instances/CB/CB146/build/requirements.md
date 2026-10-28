@@ -1,0 +1,1 @@
+Use the clean official MySQL 8.0.27 image. Initialize a synthetic homestead database and account with password secret. The instance configuration must contain the intentionally incorrect Laravel unix_socket value while leaving the real MySQL socket at /var/run/mysqld/mysqld.sock. Do not copy harnesses or metadata into the image.

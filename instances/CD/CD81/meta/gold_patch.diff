@@ -1,0 +1,7 @@
+diff --git a/etc/profile.d/cd81-locale.sh b/etc/profile.d/cd81-locale.sh
+index 5d7e8c1..4c6e89d 100644
+--- a/etc/profile.d/cd81-locale.sh
++++ b/etc/profile.d/cd81-locale.sh
+@@ -1 +1 @@
+-export LANG=ru_RU.UTF-8
++export LANG=en_GB.UTF-8

@@ -12,29 +12,40 @@ from pathlib import Path
 
 from agents.builder.prompts import render_builder_prompt, resolve_prompt_template
 from agents.manager import (
-    DEFAULT_SUBSCRIPTION_MODEL,
     CaseDefinition,
     DockerInstanceBuilder,
+    DEFAULT_LLM_PROVIDER,
     InstanceBuildDefinition,
     OpenHandsConfig,
     RegistryConfig,
     RuntimeErrorWithOutput,
     TAXONOMY_PATH,
     create_run_dir,
+    capture_agent_exception,
+    configure_agent_failure_context,
     load_case_documents,
     load_repository_env,
     login_registry,
     observe_stage,
     push_registry_image,
     record_image_distribution,
+    run_agent_entrypoint,
     run_openhands_agent,
+    summarize_agent_usage,
 )
+from agents.manager.paths import instance_dir
+from openhands.sdk.logger import get_logger
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+ASSETS_ROOT = REPO_ROOT / "assets"
 BENCHMARK_CASE_IMAGE = re.compile(
     r"^(?:ca|cb|cc|cd)\d+:",
     re.IGNORECASE,
+)
+CASE_ID_PATTERN = re.compile(r"^(CA|CB|CC|CD)\d+$", re.IGNORECASE)
+INELIGIBLE_RESPONSE = re.compile(
+    r"(?im)^MISCONFIGBENCH_INELIGIBLE:\s*(?P<reason>.+)$"
 )
 GENERATED_FILES = (
     "instance.json",
@@ -48,18 +59,37 @@ GENERATED_FILES = (
     "harness/eval_patch.sh",
 )
 
+logger = get_logger(__name__)
+
 
 def main(argv: list[str] | None = None) -> int:
     load_repository_env(REPO_ROOT)
     args = _parse_args(argv)
-    canonical_case_dir = REPO_ROOT / "instances" / args.instance_id
-    description_path = canonical_case_dir / "meta" / "description.md"
-    if not description_path.is_file():
-        print(f"Missing builder input: {description_path}", file=sys.stderr)
+    if args.validate_only:
+        from agents.builder.validate_case import main as validate_case
+        if args.regenerate or args.dry_run or args.push_image:
+            raise ValueError("--validate-only cannot regenerate, dry-run, or push images")
+        validation_args = [args.instance_id, "--timeout", str(args.validation_timeout)]
+        if args.run_dir:
+            validation_args.extend(["--run-dir", args.run_dir])
+        return validate_case(validation_args)
+    configure_agent_failure_context(instance_id=args.instance_id)
+    canonical_case_dir = instance_dir(REPO_ROOT, args.instance_id)
+    try:
+        description_path = _sync_description_from_assets(
+            args.instance_id,
+            canonical_case_dir,
+        )
+    except (FileNotFoundError, ValueError) as exc:
+        print(f"Missing builder input: {exc}", file=sys.stderr)
         return 2
 
     run_dir = create_run_dir(REPO_ROOT, f"builder-{args.instance_id}", args.run_dir)
     run_dir.mkdir(parents=True, exist_ok=False)
+    configure_agent_failure_context(
+        instance_id=args.instance_id,
+        run_dir=run_dir,
+    )
     workspace_root = run_dir / "instance_workspace"
     shutil.copytree(
         canonical_case_dir,
@@ -111,6 +141,8 @@ def main(argv: list[str] | None = None) -> int:
             result["agent_attempts"] = [
                 {"attempt": 1, "response": agent_response}
             ]
+            if _record_ineligible_result(result, agent_response):
+                return 0
 
         build_attempts = (
             max(1, args.max_build_attempts)
@@ -129,6 +161,7 @@ def main(argv: list[str] | None = None) -> int:
                     workspace_root, expected_instance_id=args.instance_id
                 )
                 _make_harness_executable(workspace_root)
+                _preflight_generated_workspace(workspace_root)
                 case = CaseDefinition.load(workspace_root, repo_root=REPO_ROOT)
                 definition = InstanceBuildDefinition.load(case)
                 builder = DockerInstanceBuilder(
@@ -144,7 +177,7 @@ def main(argv: list[str] | None = None) -> int:
                     return 0
 
                 result["build"] = builder.build()
-                validation = builder.validate()
+                validation = builder.validate(timeout_seconds=args.validation_timeout)
                 result["validation"] = validation
                 if not validation["success"]:
                     raise RuntimeErrorWithOutput(
@@ -189,6 +222,8 @@ def main(argv: list[str] | None = None) -> int:
                         "response": response,
                     }
                 )
+                if _record_ineligible_result(result, response):
+                    return 0
 
         if builder is None:
             raise RuntimeError("Builder did not produce a buildable instance")
@@ -226,8 +261,10 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     except Exception as exc:  # noqa: BLE001
         result["error"] = f"{type(exc).__name__}: {exc}"
+        capture_agent_exception(exc)
         return 1
     finally:
+        result["agent_usage"] = summarize_agent_usage(run_dir)
         result["finished_at"] = datetime.now(timezone.utc).isoformat()
         (run_dir / "result.json").write_text(
             json.dumps(result, indent=2, ensure_ascii=True) + "\n",
@@ -238,6 +275,50 @@ def main(argv: list[str] | None = None) -> int:
 
 def _is_complete(case_dir: Path) -> bool:
     return all((case_dir / relative).is_file() for relative in GENERATED_FILES)
+
+
+def _record_ineligible_result(result: dict[str, object], response: str) -> bool:
+    """Turn an explicit source-fidelity rejection into a completed run."""
+    match = INELIGIBLE_RESPONSE.search(response)
+    if match is None:
+        return False
+    result["outcome"] = "ineligible"
+    result["ineligible_reason"] = match.group("reason").strip()
+    result["success"] = True
+    return True
+
+
+def _sync_description_from_assets(
+    instance_id: str,
+    case_dir: Path,
+    assets_root: Path = ASSETS_ROOT,
+) -> Path:
+    """Initialize a missing instance description from its numbered asset."""
+    match = CASE_ID_PATTERN.fullmatch(instance_id)
+    if match is None:
+        raise ValueError(
+            f"Invalid instance ID {instance_id!r}; expected CA, CB, CC, or CD "
+            "followed by a number"
+        )
+
+    normalized_id = instance_id.upper()
+    source = assets_root / match.group(1).upper() / f"{normalized_id}.md"
+    destination = case_dir / "meta" / "description.md"
+    if destination.is_file():
+        logger.info("Using existing builder description: %s", destination)
+        return destination
+
+    if source.is_file():
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        logger.info(
+            "Initialized builder description: %s -> %s", source, destination
+        )
+        return destination
+
+    raise FileNotFoundError(
+        f"expected {source} because {destination} does not exist"
+    )
 
 
 def _ensure_layer_directories(case_dir: Path) -> None:
@@ -282,6 +363,80 @@ def _make_harness_executable(case_dir: Path) -> None:
         script.chmod(script.stat().st_mode | 0o111)
     for script in (case_dir / "build" / "context" / "scripts").glob("*.sh"):
         script.chmod(script.stat().st_mode | 0o111)
+
+
+def _preflight_generated_workspace(case_dir: Path) -> None:
+    """Reject shell patterns that turn ordinary agent mistakes into opaque runs."""
+    scripts = sorted(
+        {
+            *(case_dir / "harness").glob("*.sh"),
+            *(case_dir / "build" / "context" / "scripts").glob("*.sh"),
+        }
+    )
+    failures: list[str] = []
+    for script in scripts:
+        parsed = subprocess.run(
+            ["bash", "-n", str(script)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if parsed.returncode != 0:
+            failures.append(
+                f"{script.relative_to(case_dir)}: "
+                f"{(parsed.stderr or parsed.stdout).strip()}"
+            )
+            continue
+
+        contents = script.read_text(encoding="utf-8")
+        relative_script = script.relative_to(case_dir)
+        for number, line in enumerate(contents.splitlines(), start=1):
+            streamed_shell = re.search(
+                r"\bdocker\s+exec\s+(.*?)\b(?:bash|sh)\s+-s\b[^\n]*<", line
+            )
+            if streamed_shell and not re.search(
+                r"(?:^|\s)(?:--interactive|-[it]*i[it]*)(?:\s|$)",
+                streamed_shell.group(1),
+            ):
+                failures.append(
+                    f"{relative_script}:{number}: docker exec requires -i when "
+                    "streaming a shell script through stdin; otherwise tests may not run"
+                )
+        if (
+            "git commit -qm baseline" in contents
+            and re.search(r"\bgit(?:\s+-C\s+\S+)?\s+diff\s+--name-only\s+baseline\b", contents)
+        ):
+            failures.append(
+                f"{relative_script}: `baseline` is a commit message, not a Git revision; "
+                "use `git diff --name-only` after applying the patch"
+            )
+        if relative_script == Path("harness/eval_patch.sh") and re.search(
+            r"<\s*harness/", contents
+        ):
+            failures.append(
+                f"{relative_script}: evaluator must not read harness files through "
+                "a relative host path; resolve its own script directory"
+            )
+        if "pipefail" not in contents:
+            continue
+        for number, line in enumerate(contents.splitlines(), start=1):
+            if "|" not in line:
+                continue
+            has_early_awk_exit = bool(
+                re.search(r"\|\s*awk\b.*\bexit\b", line)
+            )
+            has_quiet_grep = bool(
+                re.search(r"\|\s*grep\b[^|]*-[A-Za-z]*q", line)
+            )
+            if has_early_awk_exit or has_quiet_grep:
+                failures.append(
+                    f"{script.relative_to(case_dir)}:{number}: "
+                    "an early-exiting pipeline consumer is unsafe with pipefail; "
+                    "capture the producer output first or use a direct command"
+                )
+
+    if failures:
+        raise ValueError("Generated shell preflight failed:\n" + "\n".join(failures))
 
 
 def _publish_workspace(workspace: Path, destination: Path) -> None:
@@ -342,6 +497,14 @@ def _render_correction_prompt(
         + "workspace and correct its files in place. Do not merely explain the "
         + "error. Keep the original public problem and taxonomy family. Use an "
         + "independent clean source image appropriate for the target software.\n\n"
+        + "Before finishing, run `bash -n` on every generated shell script. With "
+        + "`set -o pipefail`, never pipe a long-running producer into `grep -q` "
+        + "or `awk ... exit`: those consumers close the pipe early and can turn "
+        + "a correct producer into SIGPIPE/exit 141 or 255. Prefer a direct "
+        + "software query, capture output to a file, or consume the full stream. "
+        + "Evaluator scripts must keep services alive through every F2P and P2P "
+        + "check, and service harnesses must wait for their expected readiness "
+        + "state rather than treating the first connection response as ready.\n\n"
         + f"Error:\n```\n{type(error).__name__}: {error}\n```\n"
         + (f"\nDocker build log:\n```\n{build_log}\n```\n" if build_log else "")
     )
@@ -377,8 +540,9 @@ def _run_openhands_builder(
 
 
 def _openhands_config(args: argparse.Namespace) -> OpenHandsConfig:
-    return OpenHandsConfig(
+    return OpenHandsConfig.from_environment(
         model=args.model,
+        provider=args.llm_provider,
         api_key=args.api_key,
         base_url=args.base_url,
         subscription_login=args.subscription_login,
@@ -413,12 +577,19 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
         help="OpenHands is required when generated instance files do not exist.",
     )
     parser.add_argument("--regenerate", action="store_true")
+    parser.add_argument("--validate-only", action="store_true", help="Validate an existing image without rebuilding.")
+    parser.add_argument("--validation-timeout", type=int, default=180)
     parser.add_argument(
         "--model",
-        default=os.getenv("LLM_MODEL", DEFAULT_SUBSCRIPTION_MODEL),
+        default=None,
     )
-    parser.add_argument("--api-key", default=os.getenv("LLM_API_KEY"))
-    parser.add_argument("--base-url", default=os.getenv("LLM_BASE_URL"))
+    parser.add_argument(
+        "--llm-provider",
+        choices=["openai_subscription", "openlux"],
+        default=os.getenv("MISCONFIGBENCH_LLM_PROVIDER", DEFAULT_LLM_PROVIDER),
+    )
+    parser.add_argument("--api-key")
+    parser.add_argument("--base-url")
     parser.add_argument("--subscription-login", action="store_true")
     parser.add_argument("--max-iterations", type=int, default=30)
     parser.add_argument(
@@ -465,6 +636,8 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-#  "error": "ValueError: Model 'gpt-5.3-codex' is not supported for subscription access. Supported models: gpt-5.4, gpt-5.4-mini, gpt-5.5, gpt-5.6, gpt-5.6-luna, gpt-5.6-sol, gpt-5.6-terra"
+#  "error": "ValueError: Model
+# 'gpt-5.3-codex' is not supported for subscription access. Supported models: gpt-5.4, gpt-5.4-mini, gpt-5.5, gpt-5.6, gpt-5.6-luna, gpt-5.6-sol, gpt-5.6-terra"
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(run_agent_entrypoint("builder", main))
+3

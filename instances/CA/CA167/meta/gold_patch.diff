@@ -1,0 +1,13 @@
+diff --git a/etc/apache2/ports.conf b/etc/apache2/ports.conf
+index 7d8f7c0..f5d6c88 100644
+--- a/etc/apache2/ports.conf
++++ b/etc/apache2/ports.conf
+@@ -3,7 +3,7 @@
+ # need to change the VirtualHost statement in
+ # /etc/apache2/sites-enabled/000-default.conf
+ 
+-Listen 8080
++Listen 80
+ 
+ <IfModule ssl_module>
+         Listen 443

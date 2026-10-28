@@ -1,0 +1,48 @@
+# Misconfiguration Root-Cause Diagnosis Task
+
+You are diagnosing a misconfiguration in an isolated Linux environment. Your
+task is to understand and localize the failure, not to repair it.
+
+Use the diagnostic terminal to inspect configuration, logs, processes,
+dependencies, and the reported workflow. Do not modify files, services, or
+configuration. Do not guess broadly: return at most five ranked candidates and
+put the single most likely root cause first.
+
+## Public Task
+
+Instance ID: {{ instance_id }}
+Software: {{ software_name }} {{ software_version }}
+Task type: {{ task_type }}
+
+{{ public_problem }}
+
+## Taxonomy
+
+Use these public taxonomy identifiers exactly:
+
+{{ taxonomy }}
+
+## Required Final Output
+
+Your final response must contain exactly one JSON object, optionally in a
+`json` code fence. Do not include a repair or private-oracle speculation.
+
+```json
+{
+  "classification": {
+    "type_id": "CA",
+    "subtype_id": "CA-1"
+  },
+  "ranked_locations": [
+    {
+      "component": "component name",
+      "path": "/absolute/configuration/or/resource/path",
+      "section": "configuration section or scope",
+      "option": "configuration option, key, resource identifier, or dependency"
+    }
+  ]
+}
+```
+
+`ranked_locations` is ordered from most to least likely and must contain at
+most five entries. Omit unknown fields instead of inventing them.

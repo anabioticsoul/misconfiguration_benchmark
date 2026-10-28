@@ -1,0 +1,8 @@
+diff --git a/var/www/html/.ddev/php/memlimit.ini b/var/www/html/.ddev/php/memlimit.ini
+new file mode 100644
+index 0000000..5e5a9e3
+--- /dev/null
++++ b/var/www/html/.ddev/php/memlimit.ini
+@@ -0,0 +1,2 @@
++[PHP]
++memory_limit = 2G

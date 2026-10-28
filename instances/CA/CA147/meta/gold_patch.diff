@@ -1,0 +1,8 @@
+diff --git a/etc/php/8.1/cli/php.ini b/etc/php/8.1/cli/php.ini
+index 3e4f4c1..e5dbe12 100644
+--- a/etc/php/8.1/cli/php.ini
++++ b/etc/php/8.1/cli/php.ini
+@@ -1,2 +1,2 @@
+ [PHP]
+-html_errors = On
++html_errors = Off

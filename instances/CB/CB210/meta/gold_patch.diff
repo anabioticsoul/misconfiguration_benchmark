@@ -1,0 +1,7 @@
+diff --git a/etc/php/8.1/cli/conf.d/99-cb210-memory.ini b/etc/php/8.1/cli/conf.d/99-cb210-memory.ini
+index 4f0d8a1..f1d8f3e 100644
+--- a/etc/php/8.1/cli/conf.d/99-cb210-memory.ini
++++ b/etc/php/8.1/cli/conf.d/99-cb210-memory.ini
+@@ -1 +1 @@
+-memory_limit = 4M
++memory_limit = 128M

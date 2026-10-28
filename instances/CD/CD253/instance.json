@@ -1,0 +1,82 @@
+{
+  "instance_id": "CD253",
+  "benchmark": "MisconfigBench",
+  "version": "0.2",
+  "task_type": "misconfig_troubleshooting",
+  "software": {
+    "name": "Apache HTTP Server with PHP-FPM",
+    "version": "Apache 2.4 / PHP-FPM 7.4"
+  },
+  "source": {
+    "type": "public_question",
+    "url": ""
+  },
+  "image": {
+    "name": "cd253:latest",
+    "archive": "image/CD253.tar.gz",
+    "archive_format": "docker_save_tar_gzip",
+    "load_command": "docker load -i",
+    "distribution": {
+      "type": "docker_registry",
+      "reference": "docker.io/heliopolis0124/misconfigbench-cd253:v0.2",
+      "digest": "sha256:215bff80fe96bb35c06505ab8042b03846b1c21923b331b579cd35dcaf345ec2",
+      "pull_reference": "docker.io/heliopolis0124/misconfigbench-cd253@sha256:215bff80fe96bb35c06505ab8042b03846b1c21923b331b579cd35dcaf345ec2"
+    }
+  },
+  "runtime": {
+    "ready_check": "test -f /etc/php/7.4/fpm/pool.d/www.conf",
+    "ready_timeout_seconds": 60,
+    "entrypoint": "/bin/bash",
+    "command": [
+      "-lc",
+      "exec tail -f /dev/null"
+    ]
+  },
+  "task_files": {
+    "public_problem_statement": "meta/description.md",
+    "private_metadata": "meta/metadata.json",
+    "reference_patch": "meta/gold_patch.diff",
+    "fail_to_pass": [
+      "harness/f2p.sh"
+    ],
+    "pass_to_pass": [
+      "harness/p2p.sh"
+    ]
+  },
+  "prompt_protocol": {
+    "template": "prompts/misconfig_troubleshooting.j2",
+    "case_prompt": "meta/description.md"
+  },
+  "builder_protocol": {
+    "template": "prompts/instance_builder.j2",
+    "spec": "build/build.json",
+    "requirements": "build/requirements.md"
+  },
+  "evaluator_harness": {
+    "visibility": "private",
+    "reproduce": "harness/repro.sh",
+    "fail_to_pass": [
+      "harness/f2p.sh"
+    ],
+    "pass_to_pass": [
+      "harness/p2p.sh"
+    ],
+    "delivery": "host_controlled_ephemeral_container"
+  },
+  "host_harness": {
+    "evaluate_prediction": "harness/eval_patch.sh"
+  },
+  "patch_protocol": {
+    "format": "unified_diff",
+    "baseline_source": "fresh_faulty_container",
+    "apply_workdir": "dynamic_host_staging_root",
+    "apply_command": "git apply --unsafe-paths",
+    "container_delivery": "copy_allowed_configuration_files_only"
+  },
+  "success_criteria": {
+    "patch_applies": true,
+    "evaluation_script_exit_code": 0,
+    "only_allowed_files_modified": true,
+    "required_configuration_option_modified": true
+  }
+}

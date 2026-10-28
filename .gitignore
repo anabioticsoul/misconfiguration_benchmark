@@ -9,7 +9,15 @@
 !.env.example
 .vscode/settings.json
 
-runs/
-dist/
-instances/*/image/
-instances/*/workspace/
+/runs/
+/logs/
+/dist/
+/assets/
+/docs/instance-coverage.json
+/docs/instance-coverage.md
+instances/**/image/
+instances/**/workspace/
+instances/**/.eval-*/
+*.tar
+*.tar.gz
+*.tgz

@@ -1,0 +1,1 @@
+Build an Ubuntu 22.04 image with Apache HTTP Server 2.4. The base layer must serve the custom document root, while the instance layer must deny access through Apache configuration. Keep the container available for shell-based investigation.

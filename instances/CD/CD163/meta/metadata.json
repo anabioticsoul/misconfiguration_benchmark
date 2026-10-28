@@ -1,0 +1,56 @@
+{
+  "instance_id": "CD163",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "valid_http_error_override_value_hides_backend_php_error_details"
+    },
+    "diagnosis_oracle": {
+      "component": "Apache HTTP error handling"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/apache2/sites-available/cd163.conf",
+        "section": "VirtualHost *:80",
+        "option": "ProxyErrorOverride"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/apache2/sites-available/cd163.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/apache2/sites-available/cd163.conf",
+        "section": "VirtualHost *:80",
+        "option": "ProxyErrorOverride"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not change the PHP endpoint, replace the proxy, or remove the failing request"
+    ]
+  },
+  "observable_symptom": {
+    "command": "curl -fsS -o /tmp/cd163-body -w '%{http_code}' http://127.0.0.1/fault.php",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["curl: (22) The requested URL returned error: 500"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The PHP-generated diagnostic body is returned for the intentional HTTP 500 instead of the generic server error page"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The healthy PHP endpoint remains available and returns its normal response"
+      }
+    ]
+  }
+}

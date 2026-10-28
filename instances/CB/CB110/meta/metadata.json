@@ -1,0 +1,51 @@
+{
+  "instance_id": "CB110",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CB-1",
+      "root_cause_detail": "reverse_proxy_upstream_port_does_not_match_listening_backend"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/nginx/conf.d/default.conf",
+        "section": "location /jenkins",
+        "option": "proxy_pass"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/nginx/conf.d/default.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/nginx/conf.d/default.conf",
+        "section": "location /jenkins",
+        "option": "proxy_pass"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not remove the proxy location", "Do not disable nginx or replace the backend", "Do not modify the harness or backend service"]
+  },
+  "observable_symptom": {
+    "command": "curl --fail --silent --show-error http://127.0.0.1/jenkins",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["The requested URL returned error: 502"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The /jenkins reverse-proxy request reaches the backend and returns its success response after the upstream port is corrected."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The nginx configuration remains syntactically valid and the /jenkins location remains present."
+      }
+    ]
+  }
+}

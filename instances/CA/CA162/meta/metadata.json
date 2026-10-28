@@ -1,0 +1,20 @@
+{
+  "instance_id": "CA162",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {"taxonomy_version": "1.0", "category_id": "CA-2", "root_cause_detail": "spark_dataframe_writer_uses_format_specific_compression_option"},
+    "diagnosis_oracle": {"component": "Spark ORC DataFrameWriter"},
+    "faulty_targets": [{"path": "/opt/misconfigbench/orc_config.conf", "section": "orc", "option": "orc.compress"}]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/misconfigbench/orc_config.conf"],
+    "required_modified_options": [{"path": "/opt/misconfigbench/orc_config.conf", "section": "orc", "option": "compression"}],
+    "forbidden_shortcuts": ["Do not modify the Spark job, bypass ORC writing, or fake the reported codec."]
+  },
+  "observable_symptom": {"command": "/opt/spark/bin/spark-submit --master local[2] /opt/misconfigbench/run_orc_check.py", "expected_pre_fix": {"exit_code": "nonzero", "stderr_contains": ["Expected SNAPPY compression but found"]}},
+  "oracle": {
+    "fail_to_pass": [{"path": "harness/f2p.sh", "description": "The real Spark ORC write reports SNAPPY compression after the configuration option is corrected."}],
+    "pass_to_pass": [{"path": "harness/p2p.sh", "description": "The Spark runtime and ORC read-back remain functional."}]
+  }
+}

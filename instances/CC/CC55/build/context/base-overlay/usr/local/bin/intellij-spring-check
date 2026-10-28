@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+module_file=/opt/intellij-fixture/project/.idea/modules/app.iml
+context_file='file://$MODULE_DIR$/src/main/resources/applicationContext.xml'
+
+if [ ! -f "$module_file" ]; then
+  printf '%s\n' 'Spring Configuration Check' 'Unmapped Spring configuration files found.' 'Please configure/setup Spring facet for modules' >&2
+  exit 1
+fi
+
+if grep -Fq '<facet type="Spring" name="Spring">' "$module_file" && \
+   grep -Fq '<file>'"$context_file"'</file>' "$module_file"; then
+  exit 0
+fi
+
+printf '%s\n' 'Spring Configuration Check' 'Unmapped Spring configuration files found.' 'Please configure/setup Spring facet for modules' >&2
+exit 1

@@ -1,0 +1,1 @@
+Use the clean `mysql/mysql-server:8.0.27` image. Preserve its MySQL installation and runtime libraries. The base layer creates the custom multi-instance directories and initializes the minimal datadir used by the harness. The instance layer installs only the faulty AppArmor profile configuration and must not copy benchmark metadata or harness files into the image.

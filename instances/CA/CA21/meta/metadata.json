@@ -1,0 +1,64 @@
+{
+  "instance_id": "CA21",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-3",
+      "root_cause_detail": "LocalContainerEntityManagerFactoryBean lacks packagesToScan and persistenceUnitName for persistence.xml-free bootstrapping"
+    },
+    "diagnosis_oracle": {
+      "component": "Spring LocalContainerEntityManagerFactoryBean"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/ca21/src/main/resources/applicationContext.xml",
+        "section": "entityManagerFactory bean",
+        "option": "packagesToScan"
+      },
+      {
+        "path": "/opt/ca21/src/main/resources/applicationContext.xml",
+        "section": "entityManagerFactory bean",
+        "option": "persistenceUnitName"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/ca21/src/main/resources/applicationContext.xml"],
+    "required_modified_options": [
+      {
+        "path": "/opt/ca21/src/main/resources/applicationContext.xml",
+        "section": "entityManagerFactory bean",
+        "option": "packagesToScan"
+      },
+      {
+        "path": "/opt/ca21/src/main/resources/applicationContext.xml",
+        "section": "entityManagerFactory bean",
+        "option": "persistenceUnitName"
+      }
+    ],
+    "forbidden_shortcuts": ["Adding persistence.xml or replacing the real Spring startup with a synthetic error"]
+  },
+  "observable_symptom": {
+    "command": "cd /opt/ca21 && java -jar app.jar",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["No persistence units parsed from"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Spring application context starts successfully after entity scanning and persistence unit configuration are restored"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The application continues to use the H2 datasource and Hibernate schema generation settings"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+Use the clean official postgres:14-bookworm image. Preserve its normal entrypoint and PostgreSQL runtime. The instance layer must introduce only the supported listen_addresses fault by changing the bundled PostgreSQL sample configuration used during first initialization. Do not copy benchmark metadata or harness files into the image.

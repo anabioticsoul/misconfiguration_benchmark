@@ -1,0 +1,57 @@
+{
+  "instance_id": "CD170",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "requirements_omits_required_postgresql_adapter_dependency"
+    },
+    "diagnosis_oracle": {
+      "component": "psycopg2 PostgreSQL adapter"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/cd170/requirements.txt",
+        "section": "dependency requirements",
+        "option": "psycopg2"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/cd170/requirements.txt"],
+    "required_modified_options": [
+      {
+        "path": "/opt/cd170/requirements.txt",
+        "section": "dependency requirements",
+        "option": "psycopg2"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not replace the Django application or bypass its management command",
+      "Do not change settings.py or remove the PostgreSQL adapter import"
+    ]
+  },
+  "observable_symptom": {
+    "command": "/opt/cd170/run.sh",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["No module named 'psycopg2.extensions'"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The Django management check starts successfully after the PostgreSQL adapter dependency is declared"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The original Django application files and dependency declarations remain present"
+      }
+    ]
+  }
+}

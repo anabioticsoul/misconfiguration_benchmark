@@ -1,0 +1,1 @@
+Build from ubuntu:22.04. Install the pinned Ubuntu nginx and Apache HTTP Server packages plus curl. Configure the clean base with nginx listening on 80 and Apache listening on 8080. The instance overlay changes only Apache's listener to port 80, reproducing the shared-network-namespace bind conflict. Do not copy harnesses or metadata into the image.

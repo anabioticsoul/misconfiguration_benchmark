@@ -1,0 +1,10 @@
+diff --git a/etc/nginx/nginx.conf b/etc/nginx/nginx.conf
+index 1f2d8aa..8b6d5d1 100644
+--- a/etc/nginx/nginx.conf
++++ b/etc/nginx/nginx.conf
+@@ -1,4 +1,4 @@
+-user nginx;
++user root;
+ worker_processes 1;
+ pid /var/run/nginx.pid;
+ error_log /home/ubuntu/virtualenv/myapp/error/error.log warn;

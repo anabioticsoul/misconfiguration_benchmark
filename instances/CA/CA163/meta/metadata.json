@@ -1,0 +1,51 @@
+{
+  "instance_id": "CA163",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-5",
+      "root_cause_detail": "non_replayable_socket_source_configured_with_checkpoint_location"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/ca163/query.conf",
+        "section": "streaming",
+        "option": "checkpointLocation"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/ca163/query.conf"],
+    "required_modified_options": [
+      {
+        "path": "/opt/ca163/query.conf",
+        "section": "streaming",
+        "option": "checkpointLocation"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not replace the socket source or bypass Spark query execution.", "Do not delete the application or harness fixture."]
+  },
+  "observable_symptom": {
+    "command": "python3 /opt/ca163/socket_checkpoint.py",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["This query does not support recovering from checkpoint location"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "A socket streaming query can be started repeatedly without the unsupported checkpoint recovery failure."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The Spark Structured Streaming socket source remains available and the fixture executes real Spark code."
+      }
+    ]
+  }
+}

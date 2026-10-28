@@ -1,0 +1,13 @@
+diff --git a/opt/cb162/config/config.exs b/opt/cb162/config/config.exs
+index 9f8e0d0..7f3a2c1 100644
+--- a/opt/cb162/config/config.exs
++++ b/opt/cb162/config/config.exs
+@@ -6,7 +6,7 @@ config :cb162, :repo,
+   password: "",
+   database: "cb162",
+   port: 5432,
+   ssl: true,
+   ssl_opts: [
+-    versions: [:tlsv1]
++    versions: [:"tlsv1.2"]
+   ]

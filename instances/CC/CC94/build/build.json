@@ -1,0 +1,15 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CC94",
+  "images": {
+    "source": "ubuntu:22.04",
+    "base": "cc94:base",
+    "output": "cc94:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh",
+    "instance": "build/context/scripts/instance.sh"
+  },
+  "archive": "image/CC94.tar.gz"
+}

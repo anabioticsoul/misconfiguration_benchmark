@@ -1,0 +1,14 @@
+diff --git a/root/.config/Code/User/settings.json b/root/.config/Code/User/settings.json
+index 4f5e3f3..a9b7f48 100644
+--- a/root/.config/Code/User/settings.json
++++ b/root/.config/Code/User/settings.json
+@@ -1,4 +1,8 @@
+ {
+   "editor.tabSize": 4,
+-  "editor.insertSpaces": true
++  "editor.insertSpaces": true,
++  "[python]": {
++    "editor.insertSpaces": true,
++    "editor.tabSize": 4
++  }
+ }

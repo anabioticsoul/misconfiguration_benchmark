@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+import argparse
+import json
+import sys
+
+SETTINGS_PATH = "/root/.config/Code/User/settings.json"
+
+
+def load_settings():
+    try:
+        with open(SETTINGS_PATH, encoding="utf-8") as stream:
+            return json.load(stream)
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"unable to read VS Code settings: {exc}", file=sys.stderr)
+        raise SystemExit(2)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--language")
+    parser.add_argument("--expect-tab-size", type=int)
+    parser.add_argument("--expect-insert-spaces", choices=("true", "false"))
+    parser.add_argument("--verify-globals", action="store_true")
+    args = parser.parse_args()
+    settings = load_settings()
+
+    if args.verify_globals:
+        if settings.get("editor.tabSize") != 4:
+            print("global editor.tabSize is not 4", file=sys.stderr)
+            return 1
+        if settings.get("editor.insertSpaces") is not True:
+            print("global editor.insertSpaces is not true", file=sys.stderr)
+            return 1
+        print("global editor defaults valid")
+        return 0
+
+    if not args.language:
+        parser.error("--language is required unless --verify-globals is used")
+    section = settings.get(f"[{args.language}]")
+    if not isinstance(section, dict):
+        print(f"language-specific settings missing for {args.language}", file=sys.stderr)
+        return 1
+    if section.get("editor.tabSize") != args.expect_tab_size:
+        print(f"language-specific tab size mismatch for {args.language}", file=sys.stderr)
+        return 1
+    expected_spaces = args.expect_insert_spaces == "true"
+    if section.get("editor.insertSpaces") is not expected_spaces:
+        print(f"language-specific space insertion mismatch for {args.language}", file=sys.stderr)
+        return 1
+    print(f"language-specific settings valid for {args.language}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,1 @@
+Use the clean official `mysql/mysql-server:8.0.27` image. Copy the fault overlay into `/etc/mysql/conf.d/` without starting MySQL during image construction. The instance must remain an investigation shell; harnesses start MySQL explicitly with synthetic root credentials and a temporary datadir.

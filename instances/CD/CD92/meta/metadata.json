@@ -1,0 +1,54 @@
+{
+  "instance_id": "CD92",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "monthly_time_pattern_without_size_or_daily_trigger_cannot_preserve_multiple_rollovers_within_a_month"
+    },
+    "diagnosis_oracle": {
+      "component": "Logback RollingFileAppender"
+    },
+    "faulty_targets": [
+      {
+        "path": "/opt/cd92/logback.xml",
+        "section": "rollingPolicy",
+        "option": "fileNamePattern"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/opt/cd92/logback.xml"],
+    "required_modified_options": [
+      {
+        "path": "/opt/cd92/logback.xml",
+        "section": "rollingPolicy",
+        "option": "fileNamePattern"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not replace the Logback application or bypass RollingFileAppender"]
+  },
+  "observable_symptom": {
+    "command": "/opt/cd92/run-test.sh",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["expected at least two archived gzip files"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Logback size-triggered rolling produces multiple gzip archives without overwriting the active log"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The Java application still runs through Logback and writes the active log file"
+      }
+    ]
+  }
+}

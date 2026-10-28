@@ -1,0 +1,7 @@
+diff --git a/etc/profile.d/java_home.sh b/etc/profile.d/java_home.sh
+index 1111111..2222222 100644
+--- a/etc/profile.d/java_home.sh
++++ b/etc/profile.d/java_home.sh
+@@ -1 +1 @@
+-export JAVA_HOME=/Library/Java/Home
++export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-$(dpkg --print-architecture)

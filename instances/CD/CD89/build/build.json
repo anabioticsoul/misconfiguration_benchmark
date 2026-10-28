@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CD89",
+  "images": {
+    "source": "ubuntu:22.04",
+    "base": "cd89:base",
+    "output": "cd89:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh"
+  },
+  "archive": "image/CD89.tar.gz"
+}

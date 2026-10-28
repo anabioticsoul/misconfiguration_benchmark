@@ -1,0 +1,1 @@
+Use ubuntu:22.04 and install the pinned Ubuntu OpenJDK 11 runtime package. The base layer must provide `/usr/lib/jvm/java-11-openjdk-amd64` and a real Java version command. The instance layer must only add the faulty shell environment configuration; do not copy harnesses or benchmark metadata into the image.

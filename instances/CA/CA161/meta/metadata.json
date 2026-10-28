@@ -1,0 +1,54 @@
+{
+  "instance_id": "CA161",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-3",
+      "root_cause_detail": "proxy_configuration_placed_in_agent_managed_repository_file_instead_of_ambari_repository_definition"
+    },
+    "diagnosis_oracle": {
+      "component": "Apache Ambari repository management"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/ambari-agent/conf/ambari-agent.ini",
+        "section": "repository",
+        "option": "repo_proxy_mode"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/ambari-agent/conf/ambari-agent.ini"],
+    "required_modified_options": [
+      {
+        "path": "/etc/ambari-agent/conf/ambari-agent.ini",
+        "section": "repository",
+        "option": "repo_proxy_mode"
+      }
+    ],
+    "forbidden_shortcuts": ["Do not edit or delete the generated yum repository files", "Do not disable repository synchronization"]
+  },
+  "observable_symptom": {
+    "command": "/usr/local/bin/ambari-agent-repo-sync",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["repository proxy must be configured through Ambari cluster version URLs"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Repository synchronization succeeds without overwriting the proxy URL after the Ambari agent repository setting is corrected"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The generated HDP repository remains present and contains the expected repository identity and package settings"
+      }
+    ]
+  }
+}

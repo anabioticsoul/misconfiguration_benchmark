@@ -1,0 +1,76 @@
+{
+  "instance_id": "CA129",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CA-5",
+      "root_cause_detail": "missing_server_certificate_directive_and_misused_chain_directive"
+    },
+    "diagnosis_oracle": {
+      "component": "Apache mod_ssl"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/apache2/sites-available/ca129-ssl.conf",
+        "section": "<VirtualHost *:443>",
+        "option": "SSLCertificateChainFile"
+      },
+      {
+        "path": "/etc/apache2/sites-available/ca129-ssl.conf",
+        "section": "<VirtualHost *:443>",
+        "option": "SSLCACertificateFile"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/apache2/sites-available/ca129-ssl.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/apache2/sites-available/ca129-ssl.conf",
+        "section": "<VirtualHost *:443>",
+        "option": "SSLCertificateFile"
+      },
+      {
+        "path": "/etc/apache2/sites-available/ca129-ssl.conf",
+        "section": "<VirtualHost *:443>",
+        "option": "SSLCertificateChainFile"
+      },
+      {
+        "path": "/etc/apache2/sites-available/ca129-ssl.conf",
+        "section": "<VirtualHost *:443>",
+        "option": "SSLCACertificateFile"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not disable mod_ssl or HTTPS.",
+      "Do not remove the HTTPS virtual host.",
+      "Do not replace Apache with another server."
+    ]
+  },
+  "observable_symptom": {
+    "command": "apache2ctl -DFOREGROUND",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": [
+        "AH02572: Failed to configure at least one certificate and key",
+        "no certificate assigned"
+      ]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Apache's SSL configuration test succeeds with the server certificate and chain configured separately."
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The configured HTTPS virtual host, SSL module, certificate, and private key remain present and usable."
+      }
+    ]
+  }
+}

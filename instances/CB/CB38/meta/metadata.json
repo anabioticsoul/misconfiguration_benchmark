@@ -1,0 +1,56 @@
+{
+  "instance_id": "CB38",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CB-3",
+      "root_cause_detail": "nginx_worker_user_cannot_traverse_root_owned_static_directory"
+    },
+    "diagnosis_oracle": {
+      "component": "Nginx"
+    },
+    "faulty_targets": [
+      {
+        "path": "/etc/nginx/nginx.conf",
+        "section": "main",
+        "option": "user"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/etc/nginx/nginx.conf"],
+    "required_modified_options": [
+      {
+        "path": "/etc/nginx/nginx.conf",
+        "section": "main",
+        "option": "user"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Changing static-file permissions or replacing Nginx with another server instead of correcting the Nginx access configuration"
+    ]
+  },
+  "observable_symptom": {
+    "command": "curl -sS --fail -D /tmp/cb38.headers -o /dev/null http://127.0.0.1/static/img/templated/home/img.png",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["403"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "The Nginx-served static image becomes successfully retrievable after the access configuration is repaired"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "Nginx remains syntactically valid and its unaffected health endpoint continues returning healthy"
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": "2.0",
+  "instance_id": "CA115",
+  "images": {
+    "source": "ubuntu:22.04",
+    "base": "ca115:base",
+    "output": "ca115:latest"
+  },
+  "context_dir": "build/context",
+  "scripts": {
+    "base": "build/context/scripts/base.sh"
+  },
+  "archive": "image/CA115.tar.gz"
+}

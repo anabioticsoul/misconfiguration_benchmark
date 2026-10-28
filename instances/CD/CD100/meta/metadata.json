@@ -1,0 +1,67 @@
+{
+  "instance_id": "CD100",
+  "visibility": "private",
+  "private_oracle": {
+    "classification": {
+      "taxonomy_version": "1.0",
+      "category_id": "CD-2",
+      "root_cause_detail": "python_language_scope_absent_from_user_settings"
+    },
+    "diagnosis_oracle": {
+      "component": "Visual Studio Code settings"
+    },
+    "faulty_targets": [
+      {
+        "path": "/root/.config/Code/User/settings.json",
+        "section": "[python]",
+        "option": "editor.tabSize"
+      },
+      {
+        "path": "/root/.config/Code/User/settings.json",
+        "section": "[python]",
+        "option": "editor.insertSpaces"
+      }
+    ]
+  },
+  "repair_policy": {
+    "required_intervention": "config_change",
+    "allowed_modified_files": ["/root/.config/Code/User/settings.json"],
+    "required_modified_options": [
+      {
+        "path": "/root/.config/Code/User/settings.json",
+        "section": "[python]",
+        "option": "editor.tabSize"
+      },
+      {
+        "path": "/root/.config/Code/User/settings.json",
+        "section": "[python]",
+        "option": "editor.insertSpaces"
+      }
+    ],
+    "forbidden_shortcuts": [
+      "Do not modify the global editor defaults instead of adding the Python language scope",
+      "Do not replace or bypass the settings evaluator executable"
+    ]
+  },
+  "observable_symptom": {
+    "command": "/usr/local/bin/vscode-settings-check --language python --expect-tab-size 4 --expect-insert-spaces true",
+    "expected_pre_fix": {
+      "exit_code": "nonzero",
+      "stderr_contains": ["language-specific settings missing for python"]
+    }
+  },
+  "oracle": {
+    "fail_to_pass": [
+      {
+        "path": "harness/f2p.sh",
+        "description": "Python settings validation fails without a language-specific block and succeeds after the block is added"
+      }
+    ],
+    "pass_to_pass": [
+      {
+        "path": "harness/p2p.sh",
+        "description": "The existing global tab size and space insertion defaults remain valid"
+      }
+    ]
+  }
+}

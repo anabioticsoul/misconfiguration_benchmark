@@ -13,6 +13,7 @@ from agents.manager import (
     push_registry_image,
     record_image_distribution,
 )
+from agents.manager.paths import instance_dir
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -31,12 +32,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     instance_ids = args.instance_ids or sorted(
         path.name
-        for path in (REPO_ROOT / "instances").iterdir()
+        for path in (REPO_ROOT / "instances").glob("*/*")
         if (path / "instance.json").is_file()
     )
     results: list[dict[str, object]] = []
     for instance_id in instance_ids:
-        case = CaseDefinition.load(REPO_ROOT / "instances" / instance_id)
+        case = CaseDefinition.load(instance_dir(REPO_ROOT, instance_id))
         reference = config.image_reference(
             case.instance_id,
             case.benchmark_version,
